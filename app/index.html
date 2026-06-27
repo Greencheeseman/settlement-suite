@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settlement Suite™ — Live Mediation Center</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css" crossorigin="anonymous">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#0f2240;--navy2:#1a3558;
+  --green:#1d9e75;--green-lt:#e8f5ee;--green-dk:#0f6e56;
+  --gold:#c8963e;--gold-lt:#faeeda;--gold-dk:#854f0b;
+  --red:#a32d2d;--red-lt:#fcebeb;
+  --blue:#185fa5;--blue-lt:#e6f1fb;
+  --purple:#534ab7;--purple-lt:#eeedfe;
+  --gray:#f4f6f9;--gray2:#eef0f4;--gray3:#dde3ed;
+  --text:#1a1a2e;--text2:#4a5568;--text3:#8a9bb0;
+  --white:#fff;--r:8px;--r-lg:12px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;font-size:13px;color:var(--text);background:var(--gray);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* TOPBAR */
+.topbar{background:var(--navy);padding:0 16px;display:flex;align-items:center;gap:12px;height:46px;flex-shrink:0}
+.tb-brand{font-size:14px;font-weight:500;color:#fff;white-space:nowrap}
+.tb-brand span{color:var(--green)}
+.tb-case{font-size:11px;color:rgba(255,255,255,.45);padding:3px 10px;background:rgba(255,255,255,.07);border-radius:20px;white-space:nowrap}
+.tb-room{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;margin-left:4px}
+.rm-joint{background:rgba(29,158,117,.2);color:#5dcaa5;border:1px solid rgba(29,158,117,.3)}
+.rm-cp{background:rgba(200,150,62,.2);color:#fac775;border:1px solid rgba(200,150,62,.3)}
+.rm-resp{background:rgba(83,74,183,.2);color:#afa9ec;border:1px solid rgba(83,74,183,.3)}
+.rm-break{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
+.tb-clock{font-size:14px;font-weight:500;color:#fff;font-variant-numeric:tabular-nums;margin-left:auto;min-width:75px}
+.tb-timer{font-size:11px;color:rgba(255,255,255,.5);font-variant-numeric:tabular-nums;min-width:60px}
+
+/* LAYOUT — DESKTOP 3-COL DEFAULT */
+.shell{display:flex;flex:1;overflow:hidden}
+.left-col{width:300px;flex-shrink:0;display:flex;flex-direction:column;border-right:0.5px solid var(--gray3);background:var(--white)}
+.center-col{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.right-col{width:280px;flex-shrink:0;border-left:0.5px solid var(--gray3);background:var(--white);display:flex;flex-direction:column}
+
+/* MOBILE BOTTOM NAV */
+.mob-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:500;background:var(--navy);border-top:1px solid rgba(255,255,255,.1);height:56px;flex-direction:row;align-items:stretch}
+.mob-nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;color:rgba(255,255,255,.5);font-size:9px;font-weight:500;border:none;background:transparent;padding:0;transition:all .15s;font-family:inherit}
+.mob-nav-btn i{font-size:18px}
+.mob-nav-btn.active{color:var(--green)}
+.mob-nav-btn.active i{color:var(--green)}
+
+/* PANEL VISIBILITY ON MOBILE */
+@media(max-width:767px){
+  body{overflow:auto;height:auto;min-height:100dvh;padding-bottom:56px}
+  .shell{flex-direction:column;height:auto;overflow:visible}
+  .left-col,.center-col,.right-col{width:100%!important;flex-shrink:0;border:none;height:auto;min-height:0;overflow:visible}
+  .left-col{display:none;border-bottom:0.5px solid var(--gray3)}
+  .center-col{display:none}
+  .right-col{display:none}
+  .left-col.mob-active,.center-col.mob-active,.right-col.mob-active{display:flex;min-height:calc(100dvh - 100px)}
+  .mob-nav{display:flex}
+  /* topbar compact */
+  .tb-case{display:none}
+  .tb-room{display:none}
+  .tb-timer{display:none}
+  /* transcript auto-height on mobile */
+  .transcript-wrap{max-height:55vh;min-height:200px}
+  /* tabs scroll horizontally */
+  .tab-row{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .tab-row::-webkit-scrollbar{height:0}
+  .stab{white-space:nowrap;flex-shrink:0;padding:10px 10px;font-size:11px}
+  /* offer input stack */
+  .offer-input-row{grid-template-columns:1fr 1fr!important;gap:8px}
+  .offer-input-row .fg:first-child{display:none}/* hide round # on mobile */
+  .offer-input-row button{grid-column:1/-1;width:100%;justify-content:center;padding:10px}
+  /* bracket grid single col */
+  .bracket-grid{grid-template-columns:1fr!important}
+  /* damages grid single col */
+  .tabcontent#tab-damages > div > div{grid-template-columns:1fr!important}
+  /* allocation grid single col */
+  .tabcontent#tab-allocation > div > div{grid-template-columns:1fr 1fr}
+  /* proposal grid single col */
+  .tabcontent#tab-proposal > div > div{grid-template-columns:1fr!important}
+  /* tables scroll */
+  .offer-body{overflow-x:auto}
+  table.ot{min-width:680px}
+  /* paywall card */
+  .pw-card{padding:24px 20px;border-radius:12px}
+  .pw-title{font-size:20px}
+  .pw-price{font-size:32px}
+  .pw-features{padding:12px 14px}
+  /* help wrap */
+  .help-wrap{padding:12px 14px}
+  /* right col sections */
+  .summary-box{max-height:none;overflow:visible}
+  /* rec bar wrap */
+  .rec-bar{flex-wrap:wrap;gap:6px}
+  .ti-actions{flex-wrap:wrap}
+  .ti-actions button,.ti-actions label{font-size:12px}
+  textarea.ti-note{height:60px;font-size:14px}
+  .fg input,.fg select{font-size:16px;padding:8px 10px}/* prevent iOS zoom */
+}
+
+/* TABLET — 2 COL (hide left panel, show center+right stacked or side-by-side) */
+@media(min-width:768px) and (max-width:1099px){
+  body{height:100dvh}
+  .shell{height:100%;overflow:hidden}
+  .left-col{display:none}
+  .center-col{flex:1;overflow:hidden}
+  .right-col{width:240px;overflow:hidden}
+  /* tablet tab text slightly bigger */
+  .stab{font-size:11px;padding:8px 6px}
+  /* grids 1-col on narrow tablet */
+  .offer-input-row{grid-template-columns:auto 1fr 1fr 1fr auto}
+  /* bracket 1-col */
+  .bracket-grid{grid-template-columns:1fr 1fr 1fr}
+  /* show transcript toggle button in topbar */
+  .tb-transcript-toggle{display:inline-flex!important}
+  /* drawer overlay for transcript on tablet */
+  .left-col.tab-drawer{display:flex;position:fixed;left:0;top:46px;bottom:0;width:300px;z-index:400;box-shadow:4px 0 20px rgba(0,0,0,.15);border-right:0.5px solid var(--gray3)}
+}
+
+/* WIDE TABLET / SMALL LAPTOP adjustments */
+@media(min-width:1100px) and (max-width:1399px){
+  .left-col{width:260px}
+  .right-col{width:240px}
+  .stab{font-size:10px;padding:8px 3px}
+}
+
+/* LARGE DESKTOP */
+@media(min-width:1400px){
+  .left-col{width:320px}
+  .right-col{width:300px}
+}
+
+/* PANEL HEADERS */
+.ph{padding:8px 12px;border-bottom:0.5px solid var(--gray3);font-size:10.5px;font-weight:500;color:var(--text2);display:flex;align-items:center;gap:6px;flex-shrink:0;background:var(--gray)}
+.ph i{font-size:13px;color:var(--green)}
+.ph .ph-right{margin-left:auto;font-size:10px;color:var(--text3)}
+
+/* TRANSCRIPT */
+.transcript-wrap{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.t-entry{display:flex;flex-direction:column;gap:2px;animation:fadeIn .2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.t-meta{display:flex;align-items:center;gap:6px;font-size:9.5px;color:var(--text3)}
+.t-room-badge{padding:1px 6px;border-radius:8px;font-size:9px;font-weight:500}
+.trb-joint{background:var(--green-lt);color:var(--green-dk)}
+.trb-cp{background:var(--gold-lt);color:var(--gold-dk)}
+.trb-resp{background:var(--purple-lt);color:var(--purple)}
+.trb-system{background:var(--gray2);color:var(--text3)}
+.t-bubble{background:var(--gray);border-radius:0 var(--r) var(--r) var(--r);padding:7px 10px;font-size:11.5px;color:var(--text);line-height:1.5;border:0.5px solid var(--gray3)}
+.t-bubble.joint{background:var(--green-lt);border-color:rgba(29,158,117,.2)}
+.t-bubble.cp{background:var(--gold-lt);border-color:rgba(200,150,62,.2)}
+.t-bubble.resp{background:var(--purple-lt);border-color:rgba(83,74,183,.15)}
+.t-bubble.system{background:var(--blue-lt);border-color:var(--blue-lt);font-style:italic;color:var(--blue)}
+.t-bubble.ai-suggest{background:#fff;border:1.5px solid var(--green);border-radius:var(--r)}
+.t-bubble.ai-suggest .ai-header{font-size:9.5px;font-weight:500;color:var(--green-dk);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.t-bubble.ai-suggest .ai-header i{font-size:11px}
+
+/* TRANSCRIPT INPUT */
+.transcript-input{border-top:0.5px solid var(--gray3);padding:8px 10px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
+.ti-row{display:flex;gap:6px}
+.ti-room-sel{display:flex;gap:4px;flex-wrap:wrap}
+.room-btn{padding:4px 10px;border-radius:20px;font-size:10.5px;border:0.5px solid var(--gray3);background:var(--white);cursor:pointer;color:var(--text2);transition:all .12s}
+.room-btn.active-joint{background:var(--green-lt);border-color:var(--green);color:var(--green-dk);font-weight:500}
+.room-btn.active-cp{background:var(--gold-lt);border-color:var(--gold);color:var(--gold-dk);font-weight:500}
+.room-btn.active-resp{background:var(--purple-lt);border-color:var(--purple);color:var(--purple);font-weight:500}
+.room-btn.active-break{background:var(--gray2);border-color:var(--gray3);color:var(--text3);font-weight:500}
+textarea.ti-note{flex:1;border:0.5px solid var(--gray3);border-radius:var(--r);padding:6px 8px;font-size:12px;color:var(--text);resize:none;font-family:inherit;height:48px;line-height:1.4}
+textarea.ti-note:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px rgba(29,158,117,.15)}
+.ti-actions{display:flex;gap:5px;align-items:center}
+
+/* OFFER TRACKER CENTER */
+.offer-header{padding:8px 12px;border-bottom:0.5px solid var(--gray3);background:var(--gray);flex-shrink:0}
+.offer-body{flex:1;overflow-y:auto}
+.offer-input-row{display:grid;grid-template-columns:32px 1fr 1fr 1fr auto;gap:6px;align-items:end;padding:8px 12px;background:var(--white);border-bottom:0.5px solid var(--gray3)}
+table.ot{width:100%;border-collapse:collapse;font-size:11.5px}
+table.ot th{font-size:9.5px;font-weight:500;color:var(--text3);padding:5px 8px;border-bottom:0.5px solid var(--gray3);background:var(--gray);white-space:nowrap;text-align:left;position:sticky;top:0}
+table.ot td{padding:6px 8px;border-bottom:0.5px solid var(--gray3);vertical-align:top}
+table.ot tr:last-child td{border-bottom:none}
+table.ot tr.cp-row td{background:#fffdf5}
+table.ot tr.resp-row td{background:#f7f6ff}
+.suggest-cell{display:flex;flex-direction:column;gap:2px}
+.sug-chip{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:9.5px;font-weight:500;cursor:pointer;border:0.5px solid;transition:all .12s}
+.sug-chip:hover{opacity:.8}
+.sug-cp{background:var(--gold-lt);color:var(--gold-dk);border-color:rgba(200,150,62,.3)}
+.sug-resp{background:var(--purple-lt);color:var(--purple);border-color:rgba(83,74,183,.2)}
+.sug-mid{background:var(--green-lt);color:var(--green-dk);border-color:rgba(29,158,117,.3)}
+.sug-chip i{font-size:9px}
+
+/* SUMMARY AUTO-GENERATES */
+.summary-box{flex:1;overflow-y:auto;padding:10px 12px}
+.sb-section{margin-bottom:10px}
+.sb-sec-title{font-size:9.5px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;display:flex;align-items:center;gap:4px}
+.sb-sec-title i{font-size:11px;color:var(--green)}
+.sb-row{display:flex;justify-content:space-between;padding:3.5px 0;border-bottom:0.5px solid var(--gray3);font-size:11.5px}
+.sb-row:last-child{border-bottom:none}
+.sb-lbl{color:var(--text3)}
+.sb-val{font-weight:500;color:var(--navy)}
+.sb-val.green{color:var(--green-dk)}
+.sb-val.red{color:var(--red)}
+.sb-val.amber{color:var(--gold-dk)}
+.calc-strip{background:var(--navy);border-radius:var(--r);padding:10px 12px;margin-bottom:8px}
+.cs-row{display:flex;justify-content:space-between;font-size:11px;padding:2.5px 0;border-bottom:0.5px solid rgba(255,255,255,.06)}
+.cs-row:last-child{border-bottom:none;padding-top:5px;margin-top:2px}
+.cs-lbl{color:rgba(255,255,255,.5)}
+.cs-val{color:#fff;font-weight:500}
+.cs-val.g{color:#5dcaa5}
+.cs-val.r{color:#f09595}
+.cs-val.a{color:#fac775}
+.cs-val.big{font-size:14px}
+
+/* SUGGESTION PANEL */
+.sug-panel{border-top:0.5px solid var(--gray3);padding:8px 12px;background:var(--gray);flex-shrink:0;transition:background .4s}
+.sug-title{font-size:9.5px;font-weight:500;color:var(--text2);margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.sug-title i{font-size:12px;color:var(--green)}
+.sug-card{background:var(--white);border:0.5px solid var(--gray3);border-radius:var(--r);padding:7px 9px;margin-bottom:5px;font-size:11px}
+.sug-card:last-child{margin-bottom:0}
+.sug-card-header{font-size:10px;font-weight:500;margin-bottom:3px;display:flex;align-items:center;gap:4px}
+.sug-card-header i{font-size:12px}
+.sug-card-header.cp{color:var(--gold-dk)}
+.sug-card-header.resp{color:var(--purple)}
+.sug-card-body{color:var(--text2);line-height:1.5;font-style:italic}
+/* Phase indicator strip */
+.phase-strip{display:flex;gap:4px;margin-bottom:7px;align-items:center}
+.phase-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid var(--gray3);flex-shrink:0}
+.phase-dot.done{background:var(--green);border-color:var(--green)}
+.phase-dot.active{background:var(--navy);border-color:var(--navy)}
+.phase-dot-lbl{font-size:8.5px;color:var(--text3)}
+/* Mediator proposal card — locked until close phase */
+#sug-mediator-card{border-color:var(--navy);background:#f8f9fc}
+#sug-mediator-card .sug-card-header{color:var(--navy)}
+.med-unlock-badge{display:inline-flex;align-items:center;gap:3px;font-size:9px;padding:2px 7px;border-radius:8px;background:var(--navy);color:#fff;margin-bottom:6px;font-weight:500}
+.sug-card-body strong{color:var(--navy)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border-radius:var(--r);font-size:11.5px;font-weight:500;cursor:pointer;border:0.5px solid var(--gray3);background:var(--white);color:var(--text);transition:all .12s;font-family:inherit}
+.btn:hover{background:var(--gray)}
+.btn-navy{background:var(--navy);color:#fff;border-color:var(--navy)}
+.btn-navy:hover{background:var(--navy2)}
+.btn-green{background:var(--green);color:#fff;border-color:var(--green)}
+.btn-green:hover{background:var(--green-dk)}
+.btn-sm{padding:4px 9px;font-size:11px}
+.btn-icon{padding:5px;border-radius:var(--r);font-size:11px}
+
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:2px}
+.fg label{font-size:9.5px;color:var(--text3);font-weight:500}
+.fg input,.fg select{border:0.5px solid var(--gray3);border-radius:var(--r);padding:5px 8px;font-size:11.5px;color:var(--text);background:var(--white);width:100%;font-family:inherit}
+.fg input:focus,.fg select:focus{outline:none;border-color:var(--green);box-shadow:0 0 0 2px rgba(29,158,117,.15)}
+.rnd-label{font-size:11px;font-weight:500;color:var(--text3);padding-top:6px;text-align:center}
+
+/* PILLS */
+.pill{display:inline-block;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:500}
+.p-green{background:var(--green-lt);color:var(--green-dk)}
+.p-amber{background:var(--gold-lt);color:var(--gold-dk)}
+.p-red{background:var(--red-lt);color:var(--red)}
+.p-gray{background:var(--gray2);color:var(--text2)}
+.p-navy{background:#e8edf5;color:var(--navy)}
+.p-purple{background:var(--purple-lt);color:var(--purple)}
+
+/* SECTION TABS */
+.tab-row{display:flex;border-bottom:0.5px solid var(--gray3);background:var(--white);flex-shrink:0}
+.stab{flex:1;padding:8px 4px;font-size:10.5px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;text-align:center;transition:all .12s;white-space:nowrap}
+.stab.active{color:var(--navy);border-bottom-color:var(--green);font-weight:500}
+.stab:hover:not(.active){color:var(--navy);background:var(--gray)}
+.tabcontent{display:none;flex:1;overflow-y:auto}
+.tabcontent.active{display:flex;flex-direction:column}
+
+/* ALLOCATION TABLE */
+table.alloc{width:100%;border-collapse:collapse;font-size:11px}
+table.alloc th{font-size:9.5px;color:var(--text3);padding:4px 8px;border-bottom:0.5px solid var(--gray3);background:var(--gray);text-align:left}
+table.alloc td{padding:5px 8px;border-bottom:0.5px solid var(--gray3)}
+table.alloc tr:last-child td{border-bottom:none}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--gray3);border-radius:3px}
+
+/* ROOM SWITCHER */
+.room-switcher{display:flex;gap:6px;padding:6px 12px;border-bottom:0.5px solid var(--gray3);background:var(--white);flex-shrink:0}
+.rs-btn{flex:1;padding:6px 4px;border-radius:var(--r);border:1.5px solid var(--gray3);background:var(--white);cursor:pointer;font-size:10.5px;font-weight:500;color:var(--text3);text-align:center;transition:all .12s}
+.rs-btn:hover{border-color:var(--navy);color:var(--navy)}
+.rs-btn.rs-joint{border-color:var(--green);color:var(--green-dk);background:var(--green-lt)}
+.rs-btn.rs-cp{border-color:var(--gold);color:var(--gold-dk);background:var(--gold-lt)}
+.rs-btn.rs-resp{border-color:var(--purple);color:var(--purple);background:var(--purple-lt)}
+.rs-btn.rs-break{border-color:var(--gray3);color:var(--text3);background:var(--gray2)}
+
+/* AI SUMMARY */
+.ai-summary-box{background:var(--white);border:0.5px solid var(--gray3);border-radius:var(--r);padding:10px 12px;margin:8px 12px;font-size:11.5px;color:var(--text);line-height:1.6}
+.ai-sum-header{font-size:10px;font-weight:500;color:var(--green-dk);margin-bottom:6px;display:flex;align-items:center;gap:4px}
+.ai-sum-header i{font-size:12px}
+.ai-sum-section{margin-bottom:6px}
+.ai-sum-section strong{color:var(--navy);font-size:11px}
+
+/* BRACKETING */
+.bracket-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:8px 12px}
+.br-card{border:0.5px solid var(--gray3);border-radius:var(--r);padding:10px 12px;text-align:center}
+.br-card.cp{border-color:var(--gold);background:var(--gold-lt)}
+.br-card.mid{border-color:var(--green);background:var(--green-lt)}
+.br-card.resp{border-color:var(--purple);background:var(--purple-lt)}
+.br-label{font-size:9.5px;font-weight:500;margin-bottom:3px}
+.br-card.cp .br-label{color:var(--gold-dk)}
+.br-card.mid .br-label{color:var(--green-dk)}
+.br-card.resp .br-label{color:var(--purple)}
+.br-amt{font-size:18px;font-weight:500}
+.br-card.cp .br-amt{color:var(--gold-dk)}
+.br-card.mid .br-amt{color:var(--green-dk)}
+.br-card.resp .br-amt{color:var(--purple)}
+.br-sub{font-size:9px;color:var(--text3);margin-top:2px}
+
+/* RECORDING UI */
+.rec-bar{display:flex;align-items:center;gap:8px;padding:6px 12px;border-bottom:0.5px solid var(--gray3);background:var(--white);flex-shrink:0}
+.rec-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1.5px solid var(--gray3);background:var(--white);color:var(--text2);transition:all .15s;font-family:inherit}
+.rec-btn:hover{border-color:var(--navy);color:var(--navy)}
+.rec-btn.recording{background:var(--red-lt);border-color:var(--red);color:var(--red);animation:pulse-rec 1.4s infinite}
+.rec-btn.paused{background:var(--gold-lt);border-color:var(--gold);color:var(--gold-dk)}
+@keyframes pulse-rec{0%,100%{opacity:1}50%{opacity:.6}}
+.rec-dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex-shrink:0}
+.rec-status{font-size:10px;color:var(--text3);flex:1}
+.rec-status.live{color:var(--red);font-weight:500}
+.rec-status.paused{color:var(--gold-dk);font-weight:500}
+.interim-bar{padding:4px 12px;font-size:10.5px;color:var(--text3);font-style:italic;min-height:22px;background:#fffdf5;border-bottom:0.5px solid var(--gray3);flex-shrink:0;display:none}
+.interim-bar.show{display:block}
+/* Auto-log badges on transcript entries */
+.auto-badge{font-size:8.5px;padding:1px 5px;border-radius:6px;background:var(--blue-lt);color:var(--blue);font-weight:500;margin-left:4px}
+/* Transcript search */
+.trans-search{display:flex;gap:6px;padding:5px 10px;border-bottom:0.5px solid var(--gray3);flex-shrink:0}
+.trans-search input{flex:1;border:0.5px solid var(--gray3);border-radius:var(--r);padding:4px 8px;font-size:11px;color:var(--text);font-family:inherit}
+.trans-search input:focus{outline:none;border-color:var(--green)}
+.highlight{background:#fff3b0;border-radius:2px}
+/* Permission warning */
+.perm-warn{background:var(--gold-lt);border:0.5px solid var(--gold);border-radius:var(--r);padding:8px 10px;font-size:11px;color:var(--gold-dk);margin:6px 12px;display:none}
+
+/* ── PAYWALL OVERLAY ── */
+#paywallOverlay{position:fixed;inset:0;z-index:9999;background:linear-gradient(135deg,#0a1628 0%,#0f2240 60%,#0d3a2a 100%);display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif}
+.pw-card{background:#fff;border-radius:16px;padding:40px 44px;max-width:540px;width:90%;box-shadow:0 32px 80px rgba(0,0,0,.45);text-align:center}
+.pw-badge{display:inline-flex;align-items:center;gap:6px;background:var(--green-lt);color:var(--green-dk);border:1px solid rgba(29,158,117,.3);border-radius:20px;padding:5px 14px;font-size:11px;font-weight:600;letter-spacing:.4px;margin-bottom:20px}
+.pw-title{font-size:26px;font-weight:700;color:var(--navy);line-height:1.2;margin-bottom:8px}
+.pw-sub{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:24px}
+.pw-features{text-align:left;background:var(--gray);border-radius:10px;padding:16px 20px;margin-bottom:24px}
+.pw-feat{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--text);padding:5px 0;line-height:1.4}
+.pw-feat .pf-icon{color:var(--green);font-size:15px;flex-shrink:0;margin-top:1px}
+.pw-price-row{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:20px}
+.pw-price{font-size:42px;font-weight:800;color:var(--navy)}
+.pw-price sup{font-size:20px;vertical-align:super}
+.pw-price-note{text-align:left;font-size:12px;color:var(--text3);line-height:1.5}
+.pw-price-note strong{color:var(--green-dk);display:block}
+.pw-btn{display:block;width:100%;padding:16px;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:inherit;text-decoration:none;text-align:center}
+.pw-btn-primary{background:var(--green);color:#fff;margin-bottom:10px}
+.pw-btn-primary:hover{background:var(--green-dk);transform:translateY(-1px);box-shadow:0 6px 20px rgba(29,158,117,.35)}
+.pw-btn-secondary{background:var(--navy);color:#fff}
+.pw-btn-secondary:hover{background:var(--navy2);transform:translateY(-1px)}
+.pw-unlock{margin-top:16px;padding-top:16px;border-top:1px solid var(--gray3)}
+.pw-unlock label{font-size:11px;color:var(--text3);display:block;margin-bottom:6px}
+.pw-unlock-row{display:flex;gap:8px}
+.pw-unlock input{flex:1;border:1.5px solid var(--gray3);border-radius:8px;padding:9px 12px;font-size:13px;font-family:inherit;color:var(--text)}
+.pw-unlock input:focus{outline:none;border-color:var(--green)}
+.pw-unlock button{padding:9px 18px;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;white-space:nowrap}
+.pw-unlock button:hover{background:var(--navy2)}
+.pw-err{font-size:11px;color:var(--red);margin-top:6px;min-height:16px}
+.pw-guarantee{font-size:11px;color:var(--text3);margin-top:12px;display:flex;align-items:center;justify-content:center;gap:5px}
+
+/* ── HELP TAB ── */
+.help-wrap{overflow-y:auto;padding:16px 20px;flex:1}
+.help-section{margin-bottom:24px;background:var(--white);border:0.5px solid var(--gray3);border-radius:var(--r-lg);overflow:hidden}
+.help-section-header{background:var(--navy);color:#fff;padding:12px 16px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.help-section-header i{font-size:15px;color:var(--green)}
+.help-section-body{padding:14px 16px}
+.help-step{display:flex;gap:12px;padding:8px 0;border-bottom:0.5px solid var(--gray2)}
+.help-step:last-child{border-bottom:none}
+.help-step-num{width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.help-step-text{font-size:12.5px;color:var(--text);line-height:1.55}
+.help-step-text strong{color:var(--navy)}
+.help-tip{background:var(--gold-lt);border-left:3px solid var(--gold);border-radius:0 var(--r) var(--r) 0;padding:8px 12px;font-size:12px;color:var(--gold-dk);margin-top:8px;line-height:1.5}
+.help-intro{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);color:#fff;border-radius:var(--r-lg);padding:18px 20px;margin-bottom:20px}
+.help-intro h2{font-size:17px;font-weight:700;margin-bottom:6px}
+.help-intro p{font-size:12.5px;color:rgba(255,255,255,.75);line-height:1.6}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════
+     PAYWALL OVERLAY — shown until license key entered or purchase
+     ══════════════════════════════════════════════════════════ -->
+<div id="paywallOverlay">
+  <div class="pw-card">
+    <div class="pw-badge">⚖️ Settlement Suite™ Pro</div>
+    <div class="pw-title">Your Professional Mediation Command Center</div>
+    <div class="pw-sub">Everything a mediator, attorney, HR professional, or claims adjuster needs to track offers, calculate damages, and close settlements — in one browser-based tool.</div>
+
+    <div class="pw-features">
+      <div class="pw-feat"><span class="pf-icon ti ti-check"></span><span><strong>Live offer tracker</strong> — log every demand and counteroffer, auto-calculates gap and midpoint</span></div>
+      <div class="pw-feat"><span class="pf-icon ti ti-check"></span><span><strong>Damages &amp; wages calculator</strong> — back pay, benefits, emotional distress, full economic value</span></div>
+      <div class="pw-feat"><span class="pf-icon ti ti-check"></span><span><strong>Bracket calculator</strong> — find the zone of agreement between both sides</span></div>
+      <div class="pw-feat"><span class="pf-icon ti ti-check"></span><span><strong>Attorney fee &amp; allocation tab</strong> — net recovery breakdown for any fee structure</span></div>
+      <div class="pw-feat"><span class="pf-icon ti ti-check"></span><span><strong>Proposal generator</strong> — one click to draft a written settlement proposal</span></div>
+      <div class="pw-feat"><span class="pf-icon ti ti-check"></span><span><strong>Live transcript recorder</strong> — speech-to-text session notes (Chrome/Edge)</span></div>
+      <div class="pw-feat"><span class="pf-icon ti ti-check"></span><span><strong>Works in any browser</strong> — no install, no subscription, no internet required after download</span></div>
+    </div>
+
+    <div class="pw-price-row">
+      <div class="pw-price"><sup>$</sup>47</div>
+      <div class="pw-price-note">
+        <strong>One-time payment. Yours forever.</strong>
+        No subscription. No per-case fees.<br>Use for unlimited cases.
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS — shows buyer exactly what to do after purchase -->
+    <div style="background:var(--navy);border-radius:8px;padding:12px 16px;margin-bottom:16px;text-align:left">
+      <div style="font-size:10px;font-weight:600;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">How it works after you buy</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#fff">
+          <span style="width:20px;height:20px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">1</span>
+          <span>Complete purchase → your <strong style="color:#5dcaa5">license key arrives in your receipt email</strong></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#fff">
+          <span style="width:20px;height:20px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">2</span>
+          <span>Download the file → open it in <strong style="color:#5dcaa5">Google Chrome or Edge</strong></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:12px;color:#fff">
+          <span style="width:20px;height:20px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">3</span>
+          <span>Scroll down on this screen → <strong style="color:#5dcaa5">paste your key → click Unlock</strong></span>
+        </div>
+      </div>
+    </div>
+
+    <a class="pw-btn pw-btn-primary" href="https://mathelier1.gumroad.com/l/acxajj" target="_blank" rel="noopener">
+      🔒 Buy Now — $47 · Instant Access
+    </a>
+    <a class="pw-btn pw-btn-secondary" href="https://www.etsy.com/listing/settlementsuitepro" target="_blank" rel="noopener">
+      🛍️ Prefer Etsy? Buy there instead
+    </a>
+
+    <div class="pw-unlock">
+      <label style="font-size:12px;font-weight:600;color:var(--navy)">✅ Already purchased? Paste your license key here:</label>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;margin-top:3px">Check your receipt email for a key that looks like: <code style="font-family:monospace;background:var(--gray2);padding:1px 6px;border-radius:4px;font-size:11px">SSP-XXXX-XXXX-XXXX</code></div>
+      <div class="pw-unlock-row">
+        <input type="text" id="licenseInput" placeholder="Paste your key here: SSP-XXXX-XXXX-XXXX" autocomplete="off" onkeydown="if(event.key==='Enter')unlockApp()" style="font-family:monospace;letter-spacing:.5px">
+        <button onclick="unlockApp()">Unlock →</button>
+      </div>
+      <div class="pw-err" id="licenseErr"></div>
+    </div>
+
+    <div class="pw-guarantee">
+      <span class="ti ti-shield-check" style="color:var(--green)"></span>
+      Instant download · No subscription · Technical support included
+    </div>
+  </div>
+</div>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="tb-brand">Settlement<span>Suite™</span></div>
+  <span style="color:rgba(255,255,255,.2);font-size:16px">|</span>
+  <div class="tb-case" id="topCaseLabel">Case #2026-MED-0047 · Johnson v. Riverside Medical Group</div>
+  <div class="tb-room rm-joint" id="topRoom"><i class="ti ti-users" aria-hidden="true"></i> Joint session</div>
+  <div style="margin-left:8px;display:flex;align-items:center;gap:5px">
+    <div class="tb-timer" id="sessionTimerTop">Session: 00:00</div>
+    <button class="btn btn-sm" style="border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7);background:transparent;padding:3px 8px;font-size:10px" onclick="toggleTimer()" id="timerBtn"><i class="ti ti-player-play" aria-hidden="true"></i>Start</button>
+  </div>
+  <!-- Tablet: transcript drawer toggle (hidden on desktop/mobile) -->
+  <button class="btn btn-sm tb-transcript-toggle" id="tabTranscriptBtn" onclick="toggleTabletTranscript()" style="display:none;border-color:rgba(255,255,255,.2);color:rgba(255,255,255,.7);background:transparent;padding:3px 10px;font-size:10px"><i class="ti ti-microphone" aria-hidden="true"></i> Notes</button>
+  <div class="tb-clock" id="liveClock">--:--:--</div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="mob-nav" id="mobNav">
+  <button class="mob-nav-btn active" id="mnb-center" onclick="mobShowPanel('center')">
+    <i class="ti ti-list-check"></i><span>Work</span>
+  </button>
+  <button class="mob-nav-btn" id="mnb-left" onclick="mobShowPanel('left')">
+    <i class="ti ti-microphone"></i><span>Notes</span>
+  </button>
+  <button class="mob-nav-btn" id="mnb-right" onclick="mobShowPanel('right')">
+    <i class="ti ti-layout-dashboard"></i><span>Dashboard</span>
+  </button>
+</nav>
+
+<div class="shell">
+
+<!-- LEFT: TRANSCRIPT RECORDER -->
+<div class="left-col">
+  <div class="ph"><i class="ti ti-microphone" aria-hidden="true"></i>Live transcript &amp; notes
+    <span class="ph-right" id="entryCount">0 entries</span>
+  </div>
+
+  <!-- RECORDING BAR -->
+  <div class="rec-bar">
+    <button class="rec-btn" id="recBtn" onclick="toggleRecording()">
+      <span class="rec-dot"></span>Record
+    </button>
+    <button class="rec-btn" id="pauseBtn" onclick="pauseRecording()" style="display:none">
+      <i class="ti ti-player-pause" aria-hidden="true"></i>Pause
+    </button>
+    <button class="rec-btn" id="resumeBtn" onclick="resumeRecording()" style="display:none;background:var(--gold-lt);border-color:var(--gold);color:var(--gold-dk)">
+      <i class="ti ti-player-play" aria-hidden="true"></i>Resume
+    </button>
+    <span class="rec-status" id="recStatus">Ready — click Record to start live transcription</span>
+    <button class="btn btn-sm" onclick="clearTranscript()" style="margin-left:auto;font-size:10px">
+      <i class="ti ti-trash" aria-hidden="true"></i>Clear
+    </button>
+  </div>
+  <!-- Interim speech display (shows partial result while speaking) -->
+  <div class="interim-bar" id="interimBar"></div>
+  <!-- Permission warning -->
+  <div class="perm-warn" id="permWarn">
+    <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+    Microphone access was denied or is not supported in this browser.
+    Use Chrome or Edge for live transcription. Manual note entry is still available below.
+  </div>
+
+  <!-- Transcript search -->
+  <div class="trans-search">
+    <i class="ti ti-search" aria-hidden="true" style="font-size:13px;color:var(--text3);align-self:center"></i>
+    <input type="text" id="transSearch" placeholder="Search transcript..." oninput="searchTranscript(this.value)">
+  </div>
+
+  <!-- Room switcher -->
+  <div class="room-switcher">
+    <div class="rs-btn rs-joint" id="rb-joint" onclick="setRoom('joint')"><i class="ti ti-users" aria-hidden="true"></i> Joint</div>
+    <div class="rs-btn" id="rb-cp" onclick="setRoom('cp')"><i class="ti ti-user" aria-hidden="true"></i> Claimant</div>
+    <div class="rs-btn" id="rb-resp" onclick="setRoom('resp')"><i class="ti ti-building" aria-hidden="true"></i> Respondent</div>
+    <div class="rs-btn" id="rb-break" onclick="setRoom('break')"><i class="ti ti-coffee" aria-hidden="true"></i> Break</div>
+  </div>
+
+  <!-- Transcript stream -->
+  <div class="transcript-wrap" id="transcriptWrap">
+    <div class="t-entry">
+      <div class="t-meta">
+        <span class="t-room-badge trb-system">System</span>
+        <span>10:00:14</span>
+      </div>
+      <div class="t-bubble system">Session started. Parties present. Joint opening session.</div>
+    </div>
+    <div class="t-entry">
+      <div class="t-meta"><span class="t-room-badge trb-joint">Joint session</span><span>10:02:33</span></div>
+      <div class="t-bubble joint">Mediator opening statement delivered. Ground rules accepted by both parties. Process explained — voluntariness and confidentiality confirmed.</div>
+    </div>
+    <div class="t-entry">
+      <div class="t-meta"><span class="t-room-badge trb-joint">Joint session</span><span>10:09:50</span></div>
+      <div class="t-bubble joint">CP opened at $125,000. Stated primary concerns: lost wages (14 months), emotional impact, neutral reference for future employment. Attorney noted strong documentary evidence.</div>
+    </div>
+    <div class="t-entry">
+      <div class="t-meta"><span class="t-room-badge trb-joint">Joint session</span><span>10:17:22</span></div>
+      <div class="t-bubble joint">Respondent opened at $40,000. Representative cited performance documentation and disputed causation of emotional distress claim. No movement on neutral reference stated initially.</div>
+    </div>
+    <div class="t-entry">
+      <div class="t-meta"><span class="t-room-badge trb-cp">Claimant caucus</span><span>10:38:05</span></div>
+      <div class="t-bubble cp">CP privately stated willing to go as low as $85,000 if neutral reference is included. Very concerned about future employment prospects. Emphasized timing of termination — 3 weeks after FMLA notice.</div>
+    </div>
+    <div class="t-entry">
+      <div class="t-meta"><span class="t-room-badge trb-system">Facilitator note</span><span>10:38:07</span></div>
+      <div class="t-bubble ai-suggest">
+        <div class="ai-header"><i class="ti ti-message-circle" aria-hidden="true"></i>Claimant caucus — facilitator note</div>
+        Help the claimant feel heard. Ask what a good outcome looks like beyond the numbers. Explore what matters most to them: "If the other side were willing to address your key concerns, what would resolution need to look like for you?"
+      </div>
+    </div>
+    <div class="t-entry">
+      <div class="t-meta"><span class="t-room-badge trb-resp">Respondent caucus</span><span>10:52:18</span></div>
+      <div class="t-bubble resp">Respondent confirmed $55,000 authority from carrier. Open to neutral reference discussion. Attorney noted policy concerns around setting precedent. Not willing to modify personnel file.</div>
+    </div>
+    <div class="t-entry">
+      <div class="t-meta"><span class="t-room-badge trb-system">Facilitator note</span><span>10:52:20</span></div>
+      <div class="t-bubble ai-suggest">
+        <div class="ai-header"><i class="ti ti-message-circle" aria-hidden="true"></i>Respondent caucus — facilitator note</div>
+        Acknowledge the respondent's position without pressure. Explore: "Is there anything — monetary or non-monetary — that would help you feel more comfortable taking the next step? I want to make sure both sides have a full picture."
+      </div>
+    </div>
+  </div>
+
+  <!-- Note input -->
+  <div class="transcript-input">
+    <div class="ti-room-sel" id="roomSelDisplay">
+      <span style="font-size:10px;color:var(--text3);margin-top:3px">Room:</span>
+      <span id="currentRoomBadge" class="t-room-badge trb-joint">Joint session</span>
+    </div>
+    <div class="ti-row">
+      <textarea class="ti-note" id="noteInput" placeholder="Type note or observation... (Enter to log)" onkeydown="handleNoteKey(event)"></textarea>
+    </div>
+    <div class="ti-actions">
+      <button class="btn btn-green btn-sm" onclick="logNote()"><i class="ti ti-plus" aria-hidden="true"></i>Log note</button>
+      <button class="btn btn-sm" onclick="logRoomSwitch()"><i class="ti ti-door-enter" aria-hidden="true"></i>Room switch</button>
+      <button class="btn btn-sm" onclick="generateAISummary()"><i class="ti ti-sparkles" aria-hidden="true"></i>AI summary</button>
+      <label style="display:inline-flex;align-items:center;gap:5px;font-size:10px;color:var(--text3);cursor:pointer;margin-left:4px">
+        <input type="checkbox" id="autoLogChk" checked style="width:12px;height:12px;cursor:pointer">Auto-log speech
+      </label>
+      <button class="btn btn-sm" onclick="exportTranscript()" style="margin-left:auto"><i class="ti ti-download" aria-hidden="true"></i>Export</button>
+      <button class="btn btn-sm" onclick="exportTranscriptDoc()"><i class="ti ti-file-text" aria-hidden="true"></i>Save .txt</button>
+    </div>
+  </div>
+</div>
+
+<!-- CENTER: OFFER TRACKER + TABS -->
+<div class="center-col">
+  <div class="tab-row">
+    <div class="stab active" onclick="showTab('offers',this)">Offer tracker</div>
+    <div class="stab" onclick="showTab('bracket',this)">Bracketing</div>
+    <div class="stab" onclick="showTab('damages',this)">Damages / wages</div>
+    <div class="stab" onclick="showTab('allocation',this)">Allocation</div>
+    <div class="stab" onclick="showTab('proposal',this)">Proposal</div>
+    <div class="stab" onclick="showTab('summary-tab',this)">AI summary</div>
+    <div class="stab" onclick="showTab('howto',this)" style="color:var(--green);font-weight:600">❓ How To Use</div>
+  </div>
+
+  <!-- OFFER TRACKER TAB -->
+  <div class="tabcontent active" id="tab-offers" style="flex-direction:column">
+    <div class="offer-input-row">
+      <div class="fg"><label>Rnd</label><div class="rnd-label" id="nextRoundLbl">6</div></div>
+      <div class="fg"><label>CP demand ($)</label><input type="number" id="new-dem" placeholder="e.g. 110000"></div>
+      <div class="fg"><label>Respondent offer ($)</label><input type="number" id="new-off" placeholder="e.g. 50000"></div>
+      <div class="fg"><label>Notes</label><input type="text" id="new-note-ot" placeholder="After caucus..."></div>
+      <button class="btn btn-green btn-sm" onclick="addOfferRound()" style="align-self:flex-end"><i class="ti ti-plus" aria-hidden="true"></i>Add</button>
+    </div>
+    <div class="offer-body">
+      <table class="ot">
+        <thead>
+          <tr>
+            <th>Rnd</th>
+            <th>Time</th>
+            <th>CP demand</th>
+            <th>Respondent offer</th>
+            <th>Gap</th>
+            <th>Midpoint</th>
+            <th>CP move</th>
+            <th>Resp. move</th>
+            <th>Status</th>
+            <th>Suggested next move</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody id="offerTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- BRACKETING TAB -->
+  <div class="tabcontent" id="tab-bracket">
+    <div style="padding:10px 12px;border-bottom:0.5px solid var(--gray3);display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+      <div class="fg"><label>CP high bracket ($)</label><input type="number" id="br-ch" value="85000" oninput="calcBracket()"></div>
+      <div class="fg"><label>CP low bracket ($)</label><input type="number" id="br-cl" value="60000" oninput="calcBracket()"></div>
+      <div class="fg"><label>Resp. low bracket ($)</label><input type="number" id="br-rl" value="40000" oninput="calcBracket()"></div>
+      <div class="fg"><label>Resp. high bracket ($)</label><input type="number" id="br-rh" value="55000" oninput="calcBracket()"></div>
+    </div>
+    <div class="bracket-grid">
+      <div class="br-card cp"><div class="br-label">CP bracket midpoint</div><div class="br-amt" id="br-cm">$72,500</div><div class="br-sub">High: $85k · Low: $60k</div></div>
+      <div class="br-card mid"><div class="br-label">Suggested split midpoint</div><div class="br-amt" id="br-sm">$58,750</div><div class="br-sub">Auto-calculated</div></div>
+      <div class="br-card resp"><div class="br-label">Respondent bracket midpoint</div><div class="br-amt" id="br-rm">$47,500</div><div class="br-sub">Low: $40k · High: $55k</div></div>
+    </div>
+    <div style="padding:0 12px 10px">
+      <div class="calc-strip">
+        <div class="cs-row"><span class="cs-lbl">Gap between bracket lows</span><span class="cs-val" id="br-gap">$5,000</span></div>
+        <div class="cs-row"><span class="cs-lbl">Zone of potential agreement (ZOPA)</span><span class="cs-val g" id="br-zopa">$55,000 – $60,000</span></div>
+        <div class="cs-row"><span class="cs-lbl">Overlap exists?</span><span class="cs-val g" id="br-ov">Yes — bracket overlap</span></div>
+        <div class="cs-row"><span class="cs-lbl">Suggested split midpoint</span><span class="cs-val big g" id="br-sm2">$58,750</span></div>
+      </div>
+      <div style="background:var(--green-lt);border:0.5px solid rgba(29,158,117,.25);border-radius:var(--r);padding:8px 10px;font-size:11px;color:var(--text2);line-height:1.5">
+        <strong style="color:var(--green-dk);font-size:10px"><i class="ti ti-sparkles" aria-hidden="true"></i> Mediator suggestion</strong><br>
+        <span id="br-suggest">Brackets overlap by $5,000. Present split midpoint of <strong>$58,750</strong> as the zone of agreement. CP needs to move from $60k floor; respondent has room to move from $55k ceiling. A $5k "bridge" from each party closes the gap.</span>
+      </div>
+    </div>
+    <div style="overflow-y:auto;padding:0 12px 10px">
+      <div style="font-size:10px;font-weight:500;color:var(--text3);margin:8px 0 6px;text-transform:uppercase;letter-spacing:.5px">Round history</div>
+      <table class="ot" id="bracket-history-table">
+        <thead><tr><th>Rnd</th><th>CP high</th><th>CP low</th><th>CP midpoint</th><th>Resp. low</th><th>Resp. high</th><th>Resp. midpoint</th><th>Gap</th><th>Split midpoint</th><th>Notes</th></tr></thead>
+        <tbody id="bracket-tbody">
+          <tr><td>1</td><td>$55,000</td><td>$35,000</td><td>$45,000</td><td>$4,500</td><td>$10,000</td><td>$7,250</td><td>$25,000</td><td>$26,125</td><td>Opening brackets</td></tr>
+          <tr><td>2</td><td>$40,000</td><td>$20,000</td><td>$30,000</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>CP counter</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DAMAGES / WAGES TAB -->
+  <div class="tabcontent" id="tab-damages">
+    <div style="overflow-y:auto;padding:10px 12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div style="background:var(--white);border:0.5px solid var(--gray3);border-radius:var(--r);padding:10px 12px">
+          <div style="font-size:10.5px;font-weight:500;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:4px"><i class="ti ti-coins" aria-hidden="true" style="font-size:13px;color:var(--green)"></i>Lost wage calculator</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="fg"><label>Pay type</label><select id="wg-type" onchange="calcWages()"><option value="salary">Salary</option><option value="hourly">Hourly</option></select></div>
+            <div class="fg"><label>Annual salary ($)</label><input type="number" id="wg-salary" value="" placeholder="e.g. 52000" oninput="calcWages()"></div>
+            <div class="fg"><label>Hourly rate ($)</label><input type="number" id="wg-hourly" value="" placeholder="e.g. 25" oninput="calcWages()"></div>
+            <div class="fg"><label>Hours/week</label><input type="number" id="wg-hours" value="40" oninput="calcWages()"></div>
+            <div class="fg"><label>Weeks unemployed</label><input type="number" id="wg-weeks" value="" placeholder="e.g. 60" oninput="calcWages()"></div>
+            <div class="fg"><label>Benefits % (fringe)</label><input type="number" id="wg-benpct" value="0" oninput="calcWages()"></div>
+            <div class="fg"><label>Unemployment offset ($)</label><input type="number" id="wg-unemp" value="0" oninput="calcWages()"></div>
+            <div class="fg"><label>Other offsets ($)</label><label style="font-size:9px;color:var(--text3);margin-top:-2px">Mitigation earnings etc.</label><input type="number" id="wg-other" value="0" oninput="calcWages()"></div>
+          </div>
+        </div>
+        <div style="background:var(--white);border:0.5px solid var(--gray3);border-radius:var(--r);padding:10px 12px">
+          <div style="font-size:10.5px;font-weight:500;color:var(--text2);margin-bottom:8px;display:flex;align-items:center;gap:4px"><i class="ti ti-chart-bar" aria-hidden="true" style="font-size:13px;color:var(--green)"></i>Additional damages</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div class="fg"><label>Emotional distress ($)</label><input type="number" id="dmg-distress" value="0" oninput="calcWages()"></div>
+            <div class="fg"><label>Pay differential ($)</label><input type="number" id="dmg-paydiff" value="0" oninput="calcWages()"></div>
+            <div class="fg"><label>Future lost wages ($)</label><input type="number" id="dmg-future" value="0" oninput="calcWages()"></div>
+            <div class="fg"><label>Retirement loss ($)</label><input type="number" id="dmg-retire" value="0" oninput="calcWages()"></div>
+            <div class="fg"><label>Other economic ($)</label><input type="number" id="dmg-other" value="0" oninput="calcWages()"></div>
+            <div class="fg"><label>Low multiplier</label><input type="number" id="dmg-low-mult" value="0.75" step="0.05" oninput="calcWages()"></div>
+            <div class="fg"><label>High multiplier</label><input type="number" id="dmg-high-mult" value="1.25" step="0.05" oninput="calcWages()"></div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-strip">
+        <div class="cs-row"><span class="cs-lbl">Weekly pay</span><span class="cs-val" id="wg-weekly">—</span></div>
+        <div class="cs-row"><span class="cs-lbl">Gross lost wages</span><span class="cs-val" id="wg-gross">—</span></div>
+        <div class="cs-row"><span class="cs-lbl">Benefits loss</span><span class="cs-val" id="wg-ben">—</span></div>
+        <div class="cs-row"><span class="cs-lbl">Total offsets</span><span class="cs-val r" id="wg-offsets">—</span></div>
+        <div class="cs-row"><span class="cs-lbl">Net back pay (mitigated)</span><span class="cs-val g" id="wg-net">—</span></div>
+        <div class="cs-row"><span class="cs-lbl">Additional damages</span><span class="cs-val" id="dmg-add">—</span></div>
+        <div class="cs-row"><span class="cs-lbl">Total economic discussion value</span><span class="cs-val big g" id="wg-total">—</span></div>
+        <div class="cs-row"><span class="cs-lbl">Low settlement range</span><span class="cs-val a" id="wg-range-low">—</span></div>
+        <div class="cs-row"><span class="cs-lbl">High settlement range</span><span class="cs-val g" id="wg-range-high">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALLOCATION TAB -->
+  <div class="tabcontent" id="tab-allocation">
+    <div style="padding:10px 12px;overflow-y:auto">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="fg"><label>Settlement amount ($)</label><input type="number" id="al-settle" value="75000" oninput="calcAllocation()"></div>
+        <div class="fg"><label>Attorney fee %</label><select id="al-feepct" onchange="calcAllocation()"><option value="0.3333">33.33%</option><option value="0.40" selected>40%</option><option value="0.45">45%</option><option value="0">Pro se (0%)</option></select></div>
+        <div class="fg"><label>Costs / liens / deductions ($)</label><input type="number" id="al-deduct" value="0" oninput="calcAllocation()"></div>
+        <div class="fg"><label>W-2 allocation %</label><select id="al-w2pct" onchange="calcAllocation()"><option value="0.5">50% W-2</option><option value="0.6">60% W-2</option><option value="0.7">70% W-2</option><option value="0.8">80% W-2</option><option value="0.1">10% W-2</option><option value="0">100% 1099</option><option value="1">100% W-2</option></select></div>
+      </div>
+      <div class="calc-strip" style="margin-bottom:10px">
+        <div class="cs-row"><span class="cs-lbl">Gross settlement</span><span class="cs-val" id="al-gross">$75,000</span></div>
+        <div class="cs-row"><span class="cs-lbl">Attorney fee</span><span class="cs-val r" id="al-fee">-$30,000</span></div>
+        <div class="cs-row"><span class="cs-lbl">Costs / deductions</span><span class="cs-val r" id="al-ded">-$0</span></div>
+        <div class="cs-row"><span class="cs-lbl">Net to claimant (before taxes)</span><span class="cs-val big g" id="al-net">$45,000</span></div>
+        <div class="cs-row"><span class="cs-lbl">W-2 allocation (taxed as wages)</span><span class="cs-val a" id="al-w2">$37,500</span></div>
+        <div class="cs-row"><span class="cs-lbl">1099 allocation (non-wage)</span><span class="cs-val a" id="al-1099">$37,500</span></div>
+      </div>
+      <table class="alloc">
+        <thead><tr><th>Scenario</th><th>W-2 %</th><th>1099 %</th><th>W-2 amount</th><th>1099 amount</th><th>Net to claimant</th></tr></thead>
+        <tbody id="alloc-tbody"></tbody>
+      </table>
+      <div style="font-size:10px;color:var(--text3);margin-top:8px;padding:6px 8px;background:var(--gold-lt);border-radius:var(--r)">Tax disclaimer: For settlement discussion only. Not tax advice. Consult a qualified tax professional regarding W-2 reporting, Form 1099 requirements, and withholding obligations.</div>
+    </div>
+  </div>
+
+  <!-- PROPOSAL TAB -->
+  <div class="tabcontent" id="tab-proposal">
+    <div style="padding:10px 12px;overflow-y:auto">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+        <div class="fg"><label>Party making proposal</label><select id="prop-party"><option>Claimant / charging party</option><option>Respondent</option><option>Mediator bridging proposal</option></select></div>
+        <div class="fg"><label>Total settlement amount ($)</label><input type="number" id="prop-amt" value="75000" oninput="genProposal()"></div>
+        <div class="fg"><label>W-2 allocation ($)</label><input type="number" id="prop-w2" value="37500" oninput="genProposal()"></div>
+        <div class="fg"><label>1099 allocation ($)</label><input type="number" id="prop-1099" value="37500" oninput="genProposal()"></div>
+        <div class="fg"><label>Payment deadline</label><input type="text" id="prop-deadline" value="Within 21 days of execution" oninput="genProposal()"></div>
+        <div class="fg"><label>Neutral reference</label><select id="prop-ref" onchange="genProposal()"><option value="Yes — neutral reference included">Yes — neutral reference</option><option value="No">No</option><option value="TBD — under discussion">TBD</option></select></div>
+        <div class="fg"><label>Confidentiality</label><select id="prop-conf" onchange="genProposal()"><option value="Mutual confidentiality">Mutual</option><option value="Claimant only">Claimant only</option><option value="None">None</option></select></div>
+        <div class="fg"><label>Non-admission clause</label><select id="prop-noadm" onchange="genProposal()"><option value="Yes — no admission of liability">Yes</option><option value="No">No</option></select></div>
+        <div class="fg"><label>No-rehire clause</label><select id="prop-nrehire" onchange="genProposal()"><option value="Yes">Yes</option><option value="No">No</option></select></div>
+        <div class="fg"><label>Release scope</label><input type="text" id="prop-release" value="Full general release — all claims" oninput="genProposal()"></div>
+        <div class="fg" style="grid-column:1/-1"><label>Additional terms / notes</label><input type="text" id="prop-notes" value="" oninput="genProposal()" placeholder="Training, policy change, reinstatement..."></div>
+      </div>
+      <div style="background:var(--white);border:1.5px solid var(--green);border-radius:var(--r);padding:12px 14px;font-size:12px;line-height:1.7;color:var(--text)" id="proposal-output">
+        Loading proposal...
+      </div>
+      <div class="btn-row" style="margin-top:8px;display:flex;gap:6px">
+        <button class="btn btn-navy btn-sm" onclick="window.print()"><i class="ti ti-printer" aria-hidden="true"></i>Print proposal</button>
+        <button class="btn btn-sm" onclick="copyProposal()"><i class="ti ti-copy" aria-hidden="true"></i>Copy text</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI SUMMARY TAB -->
+  <div class="tabcontent" id="tab-summary-tab">
+    <div style="padding:10px 12px;overflow-y:auto">
+      <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+        <button class="btn btn-green btn-sm" onclick="generateAISummary()"><i class="ti ti-sparkles" aria-hidden="true"></i>Generate full summary</button>
+        <button class="btn btn-sm" onclick="generateRoomSummary('joint')"><i class="ti ti-users" aria-hidden="true"></i>Joint session summary</button>
+        <button class="btn btn-sm" onclick="generateRoomSummary('cp')"><i class="ti ti-user" aria-hidden="true"></i>Claimant summary</button>
+        <button class="btn btn-sm" onclick="generateRoomSummary('resp')"><i class="ti ti-building" aria-hidden="true"></i>Respondent summary</button>
+        <button class="btn btn-sm" style="margin-left:auto" onclick="window.print()"><i class="ti ti-printer" aria-hidden="true"></i>Print</button>
+      </div>
+      <div id="aiSummaryOutput">
+        <div class="ai-summary-box">
+          <div class="ai-sum-header"><i class="ti ti-sparkles" aria-hidden="true"></i>Session summary — auto-generated</div>
+          <div class="ai-sum-section"><strong>Session status:</strong> Joint session in progress. 3 rounds logged. Parties have moved.</div>
+          <div class="ai-sum-section"><strong>Current positions:</strong> CP demand $125,000 · Respondent offer $40,000 · Gap: $85,000 · Midpoint: $82,500</div>
+          <div class="ai-sum-section"><strong>CP caucus notes:</strong> CP willing to go to $85,000 floor if neutral reference included. Strong emotional distress component. FMLA temporal proximity noted as key evidentiary strength.</div>
+          <div class="ai-sum-section"><strong>Respondent caucus notes:</strong> Authority confirmed at $55,000. Open to neutral reference. Not willing to modify personnel file. Performance documentation cited as primary defense.</div>
+          <div class="ai-sum-section"><strong>Key non-monetary issues:</strong> Neutral reference (critical to CP) · Personnel file modification (refused by respondent).</div>
+          <div class="ai-sum-section"><strong>Analysis:</strong> Bracket overlap exists between $55k (resp. ceiling) and $85k (CP floor). ZOPA exists. Neutral reference likely to bridge $10–15k of monetary gap. Suggest bracketed proposal at $60k–$75k range.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HOW TO USE TAB -->
+  <div class="tabcontent" id="tab-howto">
+    <div class="help-wrap">
+
+      <div class="help-intro">
+        <h2>👋 Welcome to Settlement Suite™ Pro</h2>
+        <p>This tool helps you track settlement negotiations from start to finish. You don't need to be a lawyer or mediator to use it — just follow the steps in each tab. Everything is automatic. You type in numbers and it does the math for you.</p>
+      </div>
+
+      <!-- GETTING STARTED -->
+      <div class="help-section">
+        <div class="help-section-header"><i class="ti ti-rocket"></i>Getting Started — Do This First</div>
+        <div class="help-section-body">
+          <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text"><strong>Open the tool in Google Chrome or Microsoft Edge.</strong> These browsers support the live voice recording feature. Other browsers work but won't record audio.</div></div>
+          <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text"><strong>Look at the top bar.</strong> You'll see the case name. The tool comes loaded with a sample case so you can see how everything looks.</div></div>
+          <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>The screen has three sections:</strong> Left = notes and recording. Middle = your main working tabs. Right = live dashboard that updates automatically.</div></div>
+          <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text"><strong>Start the session timer</strong> by clicking the <em>Start</em> button in the top bar. This tracks how long your session has been running.</div></div>
+          <div class="help-tip">💡 Tip: Save this file to your computer. Open a new copy for each case so your notes stay separate.</div>
+        </div>
+      </div>
+
+      <!-- LEFT PANEL -->
+      <div class="help-section">
+        <div class="help-section-header"><i class="ti ti-microphone"></i>Left Panel — Transcript & Notes</div>
+        <div class="help-section-body">
+          <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text"><strong>Choose a room first.</strong> Click Joint, Claimant, Respondent, or Break. This tells the tool which room you're in so your notes are labeled correctly.</div></div>
+          <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text"><strong>To record live audio:</strong> Click the red <em>Record</em> button. Your browser will ask for microphone permission — click Allow. Everything said will appear as text automatically.</div></div>
+          <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>To type a note manually:</strong> Click the text box at the bottom of the left panel, type your note, and press Enter. It gets stamped with the time and room.</div></div>
+          <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text"><strong>To save the transcript:</strong> Click the <em>Save .txt</em> button. A text file downloads to your computer with all your notes and timestamps.</div></div>
+          <div class="help-step"><div class="help-step-num">5</div><div class="help-step-text"><strong>To search your notes:</strong> Type a word in the search bar at the top of the left panel. It highlights every place that word appears.</div></div>
+          <div class="help-tip">💡 Tip: Switch rooms every time you move — click the room button before you start a caucus. This keeps your notes clean and organized.</div>
+        </div>
+      </div>
+
+      <!-- OFFER TRACKER -->
+      <div class="help-section">
+        <div class="help-section-header"><i class="ti ti-arrows-exchange"></i>Tab 1 — Offer Tracker</div>
+        <div class="help-section-body">
+          <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text"><strong>This is your main negotiation log.</strong> Every time one side makes a new demand or offer, you record it here.</div></div>
+          <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text"><strong>CP demand</strong> = the amount the Claimant (the person who filed the case) is asking for.</div></div>
+          <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>Respondent offer</strong> = the amount the other side is offering to pay.</div></div>
+          <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text"><strong>Type the dollar amounts</strong> and click the green <em>Add</em> button. The tool automatically calculates the gap (difference between the two numbers) and the midpoint (the number right in the middle).</div></div>
+          <div class="help-step"><div class="help-step-num">5</div><div class="help-step-text"><strong>Suggested next move</strong> — the tool suggests what each side might offer next to keep things moving. These are just ideas, not rules.</div></div>
+          <div class="help-step"><div class="help-step-num">6</div><div class="help-step-text"><strong>Watch the right dashboard</strong> — it updates automatically every time you add a round.</div></div>
+          <div class="help-tip">💡 Tip: Add a short note for each round (like "after first caucus") so you remember what changed and why.</div>
+        </div>
+      </div>
+
+      <!-- BRACKETING -->
+      <div class="help-section">
+        <div class="help-section-header"><i class="ti ti-arrows-left-right"></i>Tab 2 — Bracketing Calculator</div>
+        <div class="help-section-body">
+          <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text"><strong>What is bracketing?</strong> A bracket is when a side gives a high and low number — like "we'll go somewhere between $60,000 and $85,000." It's a way to negotiate without committing to one number.</div></div>
+          <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text"><strong>Enter the Claimant's high and low bracket numbers</strong> on the left side. Enter the Respondent's bracket numbers on the right.</div></div>
+          <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>The tool calculates:</strong> where the brackets overlap (if at all), the suggested split in the middle, and whether there's a Zone of Potential Agreement (ZOPA).</div></div>
+          <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text"><strong>ZOPA = Zone of Potential Agreement.</strong> If the brackets overlap, both sides have shown they could agree somewhere in that range. This is a good sign!</div></div>
+          <div class="help-tip">💡 Tip: If brackets don't overlap, the gap shows how far apart they still are. Use the midpoint suggestion to propose a bridging number.</div>
+        </div>
+      </div>
+
+      <!-- DAMAGES -->
+      <div class="help-section">
+        <div class="help-section-header"><i class="ti ti-coins"></i>Tab 3 — Damages & Wages Calculator</div>
+        <div class="help-section-body">
+          <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text"><strong>Use this tab to figure out what a case might be worth</strong> based on lost wages, emotional distress, and other damages.</div></div>
+          <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text"><strong>Lost wages:</strong> Enter the person's salary or hourly pay and how many weeks they were out of work. The tool calculates gross back pay automatically.</div></div>
+          <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>Offsets:</strong> Enter any unemployment benefits or other income earned during that time. These reduce the net amount owed.</div></div>
+          <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text"><strong>Additional damages:</strong> Add amounts for emotional distress, future lost wages, retirement losses, or other economic claims on the right side.</div></div>
+          <div class="help-step"><div class="help-step-num">5</div><div class="help-step-text"><strong>Settlement range:</strong> The tool gives you a Low and High estimate based on the multipliers. This is the likely negotiating range for this case.</div></div>
+          <div class="help-tip">💡 Tip: This is for discussion only — not a legal calculation. Always confirm numbers with the attorney involved.</div>
+        </div>
+      </div>
+
+      <!-- ALLOCATION -->
+      <div class="help-section">
+        <div class="help-section-header"><i class="ti ti-receipt"></i>Tab 4 — Allocation (Attorney Fees & Tax Split)</div>
+        <div class="help-section-body">
+          <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text"><strong>What is allocation?</strong> When a settlement is paid, part of the money goes to the attorney as a fee. This tab shows how much the client actually takes home.</div></div>
+          <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text"><strong>Enter the total settlement amount</strong> and the attorney's fee percentage (like 33% for a standard contingency fee).</div></div>
+          <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>W-2 vs. 1099 split:</strong> Settlement money is often split into two types for tax purposes. W-2 money is taxed like regular wages. 1099 money is treated differently. The tool shows both.</div></div>
+          <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text"><strong>Net to claimant</strong> = the amount the client receives after the attorney takes their fee. This is the number that matters most to the person settling.</div></div>
+          <div class="help-tip">💡 Tip: Always tell people to consult a tax professional about W-2 vs. 1099 treatment. The split can affect how much they owe in taxes.</div>
+        </div>
+      </div>
+
+      <!-- PROPOSAL -->
+      <div class="help-section">
+        <div class="help-section-header"><i class="ti ti-file-text"></i>Tab 5 — Proposal Generator</div>
+        <div class="help-section-body">
+          <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text"><strong>Use this tab to create a written settlement proposal</strong> that you can print or copy and share with both sides.</div></div>
+          <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text"><strong>Fill in the fields:</strong> settlement amount, W-2/1099 split, payment deadline, and key terms like confidentiality and neutral reference.</div></div>
+          <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>The proposal writes itself</strong> as you fill in the fields. It updates in real time in the green box below the inputs.</div></div>
+          <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text"><strong>Click Print Proposal</strong> to print a clean version, or <em>Copy Text</em> to paste it into an email or document.</div></div>
+          <div class="help-tip">💡 Tip: This is a discussion proposal, not a legal agreement. Have the attorney draft the final settlement agreement and release.</div>
+        </div>
+      </div>
+
+      <!-- AI SUMMARY -->
+      <div class="help-section">
+        <div class="help-section-header"><i class="ti ti-sparkles"></i>Tab 6 — AI Summary</div>
+        <div class="help-section-body">
+          <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text"><strong>This tab generates a summary of your entire session</strong> based on everything logged in the transcript on the left.</div></div>
+          <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text"><strong>Click "Generate full summary"</strong> to see a complete recap — current positions, key issues, caucus notes, and a suggested path forward.</div></div>
+          <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>You can also generate summaries by room:</strong> Click Joint, Claimant, or Respondent to see just that room's highlights.</div></div>
+          <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text"><strong>Print the summary</strong> for your records or to share with the parties at the end of the session.</div></div>
+          <div class="help-tip">💡 Tip: The more notes you log in the left panel during the session, the more detailed and accurate the summary will be.</div>
+        </div>
+      </div>
+
+      <!-- RIGHT DASHBOARD -->
+      <div class="help-section">
+        <div class="help-section-header"><i class="ti ti-layout-dashboard"></i>Right Panel — Live Dashboard</div>
+        <div class="help-section-body">
+          <div class="help-step"><div class="help-step-num">1</div><div class="help-step-text"><strong>The right panel updates automatically</strong> every time you add an offer round. You don't have to do anything.</div></div>
+          <div class="help-step"><div class="help-step-num">2</div><div class="help-step-text"><strong>Gap closed</strong> = total amount the parties have moved toward each other since round 1. Watch this number grow as negotiation progresses.</div></div>
+          <div class="help-step"><div class="help-step-num">3</div><div class="help-step-text"><strong>Negotiation phase</strong> shows where you are in the process: Early Exploration → Active Negotiation → Narrowing → Settlement Range Reached.</div></div>
+          <div class="help-step"><div class="help-step-num">4</div><div class="help-step-text"><strong>Non-monetary terms</strong> at the bottom let you check off things like neutral reference, confidentiality, and reinstatement as they are agreed upon.</div></div>
+        </div>
+      </div>
+
+      <!-- SUPPORT -->
+      <div class="help-section">
+        <div class="help-section-header"><i class="ti ti-headset"></i>Support & Questions</div>
+        <div class="help-section-body">
+          <div class="help-step"><div class="help-step-num">✉</div><div class="help-step-text"><strong>Need help?</strong> Contact us through your purchase platform (Gumroad or Etsy) and we'll respond within 1 business day.</div></div>
+          <div class="help-step"><div class="help-step-num">🔒</div><div class="help-step-text"><strong>Your data stays private.</strong> This tool runs completely in your browser. Nothing is sent to any server. Your case notes never leave your computer.</div></div>
+          <div class="help-step"><div class="help-step-num">💾</div><div class="help-step-text"><strong>Save your work:</strong> Use your browser's File → Save Page As to save a snapshot of your session. Or use the Export and Save .txt buttons in the left panel.</div></div>
+          <div class="help-tip">💡 Legal disclaimer: Settlement Suite Pro is an organizational tool only. It is not legal advice. Always work with a licensed attorney for legal decisions.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- RIGHT: LIVE DASHBOARD -->
+<div class="right-col">
+  <div class="ph"><i class="ti ti-layout-dashboard" aria-hidden="true"></i>Live dashboard</div>
+  <div class="summary-box">
+
+    <div class="sb-section">
+      <div class="sb-sec-title"><i class="ti ti-arrows-exchange" aria-hidden="true"></i>Current positions</div>
+      <div class="sb-row"><span class="sb-lbl">CP demand</span><span class="sb-val" id="dash-dem">$125,000</span></div>
+      <div class="sb-row"><span class="sb-lbl">Respondent offer</span><span class="sb-val green" id="dash-off">$40,000</span></div>
+      <div class="sb-row"><span class="sb-lbl">Gap</span><span class="sb-val red" id="dash-gap">$85,000</span></div>
+      <div class="sb-row"><span class="sb-lbl">Midpoint</span><span class="sb-val amber" id="dash-mid">$82,500</span></div>
+      <div class="sb-row"><span class="sb-lbl">Split midpoint</span><span class="sb-val" id="dash-split" style="color:var(--purple)">$58,750</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-sec-title"><i class="ti ti-trending-down" aria-hidden="true"></i>Movement history</div>
+      <div class="sb-row"><span class="sb-lbl">CP total movement</span><span class="sb-val green" id="dash-cp-move">—</span></div>
+      <div class="sb-row"><span class="sb-lbl">Resp. total movement</span><span class="sb-val green" id="dash-resp-move">—</span></div>
+      <div class="sb-row"><span class="sb-lbl">Gap closed</span><span class="sb-val green" id="dash-gap-closed">—</span></div>
+      <div class="sb-row"><span class="sb-lbl">Rounds logged</span><span class="sb-val" id="dash-rounds">5</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-sec-title"><i class="ti ti-coin" aria-hidden="true"></i>Financial summary</div>
+      <div class="sb-row"><span class="sb-lbl">Est. lost wages</span><span class="sb-val" id="dash-lw">—</span></div>
+      <div class="sb-row"><span class="sb-lbl">Settlement range (low)</span><span class="sb-val" id="dash-lo">—</span></div>
+      <div class="sb-row"><span class="sb-lbl">Settlement range (high)</span><span class="sb-val" id="dash-hi">—</span></div>
+      <div class="sb-row"><span class="sb-lbl">Atty fee (40%)</span><span class="sb-val" id="dash-fee">$30,000</span></div>
+      <div class="sb-row"><span class="sb-lbl">Net to claimant</span><span class="sb-val green" id="dash-net">$45,000</span></div>
+    </div>
+
+    <div class="sb-section">
+      <div class="sb-sec-title"><i class="ti ti-checklist" aria-hidden="true"></i>Non-monetary terms</div>
+      <div class="sb-row"><span class="sb-lbl">Neutral reference</span><span class="sb-val amber">Under discussion</span></div>
+      <div class="sb-row"><span class="sb-lbl">Confidentiality</span><span class="sb-val green">Agreed (mutual)</span></div>
+      <div class="sb-row"><span class="sb-lbl">Personnel file mod.</span><span class="sb-val red">Refused</span></div>
+      <div class="sb-row"><span class="sb-lbl">No-admission clause</span><span class="sb-val green">Standard — agreed</span></div>
+    </div>
+
+  </div>
+
+  <!-- LIVE SUGGESTION PANEL -->
+  <div class="sug-panel" id="sugPanel">
+    <div class="sug-title" id="sugPanelTitle"><i class="ti ti-message-circle" aria-hidden="true"></i><span id="sugPhaseLbl">Facilitator notes</span></div>
+    <div class="phase-strip">
+      <div class="phase-dot active" id="pd-early"></div><div class="phase-dot-lbl">Explore</div>
+      <div style="flex:1;height:1px;background:var(--gray3)"></div>
+      <div class="phase-dot" id="pd-mid"></div><div class="phase-dot-lbl">Negotiate</div>
+      <div style="flex:1;height:1px;background:var(--gray3)"></div>
+      <div class="phase-dot" id="pd-late"></div><div class="phase-dot-lbl">Narrow</div>
+      <div style="flex:1;height:1px;background:var(--gray3)"></div>
+      <div class="phase-dot" id="pd-close"></div><div class="phase-dot-lbl">Proposal</div>
+    </div>
+    <div id="sug-cp-card" class="sug-card">
+      <div class="sug-card-header cp"><i class="ti ti-user" aria-hidden="true"></i>Claimant caucus — facilitator note</div>
+      <div class="sug-card-body" id="sug-cp-body">Awaiting first round to generate facilitator notes.</div>
+    </div>
+    <div id="sug-resp-card" class="sug-card">
+      <div class="sug-card-header resp"><i class="ti ti-building" aria-hidden="true"></i>Respondent caucus — facilitator note</div>
+      <div class="sug-card-body" id="sug-resp-body">Awaiting first round to generate facilitator notes.</div>
+    </div>
+    <div id="sug-mediator-card" class="sug-card" style="display:none;border-color:var(--navy)">
+      <div class="sug-card-header" style="color:var(--navy)"><i class="ti ti-scale" aria-hidden="true"></i>Mediator's proposal — both rooms</div>
+      <div class="sug-card-body" id="sug-mediator-body"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end shell -->
+
+<script>
+/* ---- STATE ---- */
+var currentRoom='joint';
+var timerRunning=false;var timerSecs=0;var timerInt=null;
+var offerRounds=[
+  {n:1,time:'10:09',dem:125000,off:0,notes:'CP opening'},
+  {n:2,time:'10:17',dem:0,off:40000,notes:'Respondent opening'},
+  {n:3,time:'10:38',dem:0,off:0,notes:'Moved to caucuses'},
+  {n:4,time:'10:45',dem:110000,off:0,notes:'CP counter (post-caucus)'},
+  {n:5,time:'10:52',dem:0,off:50000,notes:'Resp. counter (post-caucus)'}
+];
+var transcriptEntries=[];
+
+/* ---- UTILITIES ---- */
+var F=function(n){return n!=null&&n!==''&&!isNaN(n)?'$'+Math.round(n).toLocaleString():'—'};
+var PCT=function(v,t){return t>0?Math.round(v/t*100)+'%':'—'};
+var now=function(){var d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0')};
+
+/* ---- CLOCK ---- */
+setInterval(function(){
+  var d=new Date();
+  document.getElementById('liveClock').textContent=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0');
+},1000);
+
+/* ---- SESSION TIMER ---- */
+function toggleTimer(){
+  if(!timerRunning){
+    timerRunning=true;
+    document.getElementById('timerBtn').innerHTML='<i class="ti ti-player-pause" aria-hidden="true"></i>Pause';
+    timerInt=setInterval(function(){
+      timerSecs++;
+      var m=Math.floor(timerSecs/60);var s=timerSecs%60;
+      document.getElementById('sessionTimerTop').textContent='Session: '+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+    },1000);
+  }else{
+    timerRunning=false;
+    clearInterval(timerInt);
+    document.getElementById('timerBtn').innerHTML='<i class="ti ti-player-play" aria-hidden="true"></i>Resume';
+  }
+}
+
+/* ---- ROOM ---- */
+var roomLabels={joint:'Joint session',cp:'Claimant caucus',resp:'Respondent caucus',break:'Break'};
+var roomBadgeClass={joint:'trb-joint',cp:'trb-cp',resp:'trb-resp',break:'trb-system'};
+var roomTopClass={joint:'rm-joint',cp:'rm-cp',resp:'rm-resp',break:'rm-break'};
+var roomIcons={joint:'ti-users',cp:'ti-user',resp:'ti-building',break:'ti-coffee'};
+function setRoom(r){
+  currentRoom=r;
+  ['joint','cp','resp','break'].forEach(function(x){
+    document.getElementById('rb-'+x).className='rs-btn'+(x===r?' rs-'+r:'');
+  });
+  document.getElementById('currentRoomBadge').className='t-room-badge '+roomBadgeClass[r];
+  document.getElementById('currentRoomBadge').textContent=roomLabels[r];
+  document.getElementById('topRoom').className='tb-room '+roomTopClass[r];
+  document.getElementById('topRoom').innerHTML='<i class="ti '+roomIcons[r]+'" aria-hidden="true"></i> '+roomLabels[r];
+}
+
+/* ---- TRANSCRIPT ---- */
+/* ══════════════════════════════════════════════
+   RESPONSIVE — MOBILE PANEL SWITCHER & TABLET DRAWER
+   ══════════════════════════════════════════════ */
+function isMobile(){ return window.innerWidth < 768; }
+function isTablet(){ return window.innerWidth >= 768 && window.innerWidth < 1100; }
+
+function mobShowPanel(panel){
+  if(!isMobile()) return;
+  var panels = {
+    left: document.querySelector('.left-col'),
+    center: document.querySelector('.center-col'),
+    right: document.querySelector('.right-col')
+  };
+  Object.keys(panels).forEach(function(k){
+    panels[k].classList.remove('mob-active');
+  });
+  panels[panel].classList.add('mob-active');
+  // update nav buttons
+  ['left','center','right'].forEach(function(k){
+    var btn = document.getElementById('mnb-'+k);
+    if(btn) btn.classList.toggle('active', k===panel);
+  });
+  window.scrollTo(0,0);
+}
+
+var _tabletDrawerOpen = false;
+function toggleTabletTranscript(){
+  var lc = document.querySelector('.left-col');
+  if(_tabletDrawerOpen){
+    lc.classList.remove('tab-drawer');
+    _tabletDrawerOpen = false;
+  } else {
+    lc.classList.add('tab-drawer');
+    _tabletDrawerOpen = true;
+  }
+}
+
+// Close tablet drawer when clicking outside
+document.addEventListener('click', function(e){
+  if(!isTablet()) return;
+  var lc = document.querySelector('.left-col');
+  var btn = document.getElementById('tabTranscriptBtn');
+  if(_tabletDrawerOpen && !lc.contains(e.target) && e.target !== btn && !btn.contains(e.target)){
+    lc.classList.remove('tab-drawer');
+    _tabletDrawerOpen = false;
+  }
+});
+
+// On resize, reset mobile panel state
+window.addEventListener('resize', function(){
+  if(!isMobile()){
+    ['left-col','center-col','right-col'].forEach(function(c){
+      document.querySelector('.'+c).classList.remove('mob-active');
+    });
+  } else {
+    // ensure center is shown by default on mobile
+    var anyActive = document.querySelector('.mob-active');
+    if(!anyActive) mobShowPanel('center');
+  }
+});
+
+// Init mobile: show center panel on load
+if(isMobile()) { mobShowPanel('center'); }
+
+/* ══════════════════════════════════════════════
+   PAYWALL + LICENSE KEY SYSTEM
+   Valid keys: any key starting with SSP-
+   For production: replace with your own key list or Gumroad webhook
+   ══════════════════════════════════════════════ */
+function simpleHash(str) {
+  var h = 0; var salt = 'MMG2026SSP'; var s = str + salt;
+  for (var i = 0; i < s.length; i++) { h = Math.imul(31, h) + s.charCodeAt(i) | 0; }
+  return h.toString(36);
+}
+function unlockApp() {
+  var key = document.getElementById('licenseInput').value.trim().toUpperCase();
+  var err = document.getElementById('licenseErr');
+  var validPattern = /^SSP-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+  if (validPattern.test(key)) {
+    document.getElementById('paywallOverlay').style.display = 'none';
+    localStorage.setItem('ssp_licensed', key);
+    localStorage.setItem('ssp_lh', simpleHash(key));
+    err.textContent = '';
+  } else {
+    err.textContent = 'Invalid key. Keys look like: SSP-XXXX-XXXX-XXXX. Check your purchase receipt.';
+  }
+}
+
+// Auto-unlock with hash verification — prevents localStorage bypass
+(function checkPriorLicense() {
+  var stored = localStorage.getItem('ssp_licensed');
+  var storedHash = localStorage.getItem('ssp_lh');
+  if (stored && storedHash && storedHash === simpleHash(stored) && /^SSP-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(stored)) {
+    document.getElementById('paywallOverlay').style.display = 'none';
+  }
+})();
+
+function logNote(){
+  var txt=document.getElementById('noteInput').value.trim();
+  if(!txt)return;
+  addTranscriptEntry(currentRoom,txt,now());
+  document.getElementById('noteInput').value='';
+  updateSuggestions();
+}
+
+function handleNoteKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();logNote();}}
+
+function logRoomSwitch(){
+  var msg='Room switch → '+roomLabels[currentRoom];
+  addTranscriptEntry('system','['+msg+']',now());
+}
+
+function addTranscriptEntry(room,text,time){
+  transcriptEntries.push({room:room,text:text,time:time});
+  var wrap=document.getElementById('transcriptWrap');
+  var badgeClass=roomBadgeClass[room]||'trb-system';
+  var bubbleClass=room==='joint'?'joint':room==='cp'?'cp':room==='resp'?'resp':room==='system'?'system':'';
+  var safeText=typeof escapeHtml==='function'?escapeHtml(text):text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  var html='<div class="t-entry"><div class="t-meta"><span class="t-room-badge '+badgeClass+'">'+roomLabels[room]+'</span><span>'+time+'</span></div><div class="t-bubble '+bubbleClass+'">'+safeText+'</div></div>';
+  wrap.insertAdjacentHTML('beforeend',html);
+  wrap.scrollTop=wrap.scrollHeight;
+  document.getElementById('entryCount').textContent=transcriptEntries.length+' entries';
+}
+
+/* ---- OFFER TRACKER ---- */
+function renderOffers(){
+  var tbody=document.getElementById('offerTbody');
+  tbody.innerHTML='';
+  var lastDem=null;var lastOff=null;var firstDem=null;var firstOff=null;
+  offerRounds.forEach(function(r,i){
+    var prevDem=i>0?offerRounds[i-1].dem:null;
+    var prevOff=i>0?offerRounds[i-1].off:null;
+    var gap=r.dem&&r.off?Math.abs(r.dem-r.off):null;
+    var mid=r.dem&&r.off?(r.dem+r.off)/2:null;
+    var cpMove=r.dem&&prevDem&&prevDem?prevDem-r.dem:null;
+    var respMove=r.off&&prevOff?r.off-prevOff:null;
+    if(r.dem){lastDem=r.dem;if(firstDem===null)firstDem=r.dem;}
+    if(r.off){lastOff=r.off;if(firstOff===null)firstOff=r.off;}
+
+    var suggestCPNext='',suggestRespNext='';
+    if(r.dem){
+      var sugCP=Math.round(r.dem*0.88);
+      suggestCPNext='<div class="suggest-cell"><div class="sug-chip sug-cp" onclick="applySuggestion(\'cp\','+sugCP+')"><i class="ti ti-arrow-down" aria-hidden="true"></i>Consider '+F(sugCP)+'</div></div>';
+    }
+    if(r.off){
+      var sugResp=Math.round(r.off*1.12);
+      suggestRespNext='<div class="suggest-cell"><div class="sug-chip sug-resp" onclick="applySuggestion(\'resp\','+sugResp+')"><i class="ti ti-arrow-up" aria-hidden="true"></i>Consider '+F(sugResp)+'</div></div>';
+    }
+    if(r.dem&&r.off){
+      suggestCPNext+='<div class="sug-chip sug-mid" style="margin-top:2px" onclick="applySuggestion(\'mid\','+Math.round(mid)+')"><i class="ti ti-target" aria-hidden="true"></i>Midpoint '+F(mid)+'</div>';
+    }
+
+    var rowClass=r.dem&&!r.off?'cp-row':r.off&&!r.dem?'resp-row':'';
+    var tr='<tr class="'+rowClass+'">';
+    tr+='<td>'+r.n+'</td>';
+    tr+='<td style="color:var(--text3)">'+r.time+'</td>';
+    tr+='<td style="color:var(--gold-dk);font-weight:500">'+(r.dem?F(r.dem):'—')+'</td>';
+    tr+='<td style="color:var(--purple);font-weight:500">'+(r.off?F(r.off):'—')+'</td>';
+    tr+='<td style="color:var(--red)">'+(gap?F(gap):'—')+'</td>';
+    tr+='<td style="color:var(--green-dk)">'+(mid?F(mid):'—')+'</td>';
+    tr+='<td>'+(cpMove!==null&&cpMove>0?'<span class="pill p-green">↓ '+F(cpMove)+'</span>':cpMove!==null&&cpMove<0?'<span class="pill p-red">↑ '+F(Math.abs(cpMove))+'</span>':'—')+'</td>';
+    tr+='<td>'+(respMove!==null&&respMove>0?'<span class="pill p-green">↑ '+F(respMove)+'</span>':respMove!==null&&respMove<0?'<span class="pill p-red">↓ '+F(Math.abs(respMove))+'</span>':'—')+'</td>';
+    tr+='<td><span class="pill '+(i===offerRounds.length-1?'p-amber':'p-gray')+'">'+(i===offerRounds.length-1?'Active':'Logged')+'</span></td>';
+    tr+='<td>'+(suggestCPNext||suggestRespNext||'—')+'</td>';
+    tr+='<td style="color:var(--text3)">'+r.notes+'</td>';
+    tr+='</tr>';
+    tbody.insertAdjacentHTML('beforeend',tr);
+  });
+  document.getElementById('nextRoundLbl').textContent=offerRounds.length+1;
+  updateDashboard();
+}
+
+function addOfferRound(){
+  var dem=+document.getElementById('new-dem').value||0;
+  var off=+document.getElementById('new-off').value||0;
+  var note=document.getElementById('new-note-ot').value||'';
+  if(!dem&&!off){alert('Enter at least a demand or offer.');return;}
+  var n=offerRounds.length+1;
+  var t=now().substring(0,5);
+  offerRounds.push({n:n,time:t,dem:dem,off:off,notes:note});
+  document.getElementById('new-dem').value='';
+  document.getElementById('new-off').value='';
+  document.getElementById('new-note-ot').value='';
+  renderOffers();
+  updateSuggestions();
+  var logText='Round '+n+' logged: '+(dem?'CP demand '+F(dem):'')+(dem&&off?' · ':'')+(off?'Resp. offer '+F(off):'')+' '+(note?'('+note+')':'');
+  addTranscriptEntry('system','[Offer tracker] '+logText,now());
+}
+
+function applySuggestion(type,amt){
+  if(type==='cp'){document.getElementById('new-dem').value=amt;}
+  else if(type==='resp'){document.getElementById('new-off').value=amt;}
+  else{document.getElementById('new-dem').value=amt;document.getElementById('new-off').value=amt;}
+  showTab('offers',document.querySelector('.stab'));
+}
+
+/* ---- DASHBOARD UPDATE ---- */
+function updateDashboard(){
+  var lastDem=null,lastOff=null,firstDem=null,firstOff=null;
+  offerRounds.forEach(function(r){
+    if(r.dem){lastDem=r.dem;if(firstDem===null)firstDem=r.dem;}
+    if(r.off){lastOff=r.off;if(firstOff===null)firstOff=r.off;}
+  });
+  if(lastDem)document.getElementById('dash-dem').textContent=F(lastDem);
+  if(lastOff)document.getElementById('dash-off').textContent=F(lastOff);
+  if(lastDem&&lastOff){
+    var gap=lastDem-lastOff;
+    var mid=(lastDem+lastOff)/2;
+    document.getElementById('dash-gap').textContent=F(gap);
+    document.getElementById('dash-mid').textContent=F(mid);
+  }
+  if(firstDem&&lastDem)document.getElementById('dash-cp-move').textContent=F(firstDem-lastDem);
+  if(firstOff&&lastOff)document.getElementById('dash-resp-move').textContent=F(lastOff-firstOff);
+  if(firstDem&&firstOff&&lastDem&&lastOff){
+    var firstGap=firstDem-firstOff;
+    var lastGap=lastDem-lastOff;
+    document.getElementById('dash-gap-closed').textContent=F(firstGap-lastGap);
+  }
+  document.getElementById('dash-rounds').textContent=offerRounds.length;
+}
+
+/* ---- PHASE-AWARE FACILITATIVE SUGGESTION ENGINE ---- */
+/*
+  Phase thresholds (gap as pct of opening gap):
+    EARLY  over 70pct remaining  -- reflective questions, no numbers
+    MID    40-70pct remaining    -- gentle framing, explore movement
+    LATE   15-40pct remaining    -- focused reframing, options
+    CLOSE  under 15pct remaining -- mediator proposal unlocked
+    SETTLED gap 0 or overlap     -- confirm and close
+*/
+function getPhase(firstGap, currentGap){
+  if(!firstGap||firstGap===0)return 'early';
+  var pct=currentGap/firstGap;
+  if(pct>0.70)return 'early';
+  if(pct>0.40)return 'mid';
+  if(pct>0.15)return 'late';
+  return 'close';
+}
+
+var PHASE_LABELS={
+  early:'Early exploration',
+  mid:'Active negotiation',
+  late:'Narrowing — closing in',
+  close:'Settlement range reached'
+};
+
+var CP_PHRASES={
+  early:[
+    'Help the claimant feel heard. Ask what a good outcome would look like beyond the numbers. Explore what is most important to them.',
+    'Reflect back what you heard: "It sounds like this experience has had a significant impact on you. Can you tell me more about what a resolution would need to address?"',
+    'Ask an open question: "If the other side were willing to meet some of your key concerns, what would that look like to you?"'
+  ],
+  mid:[
+    'Acknowledge the movement made so far. Ask: "What would help you feel comfortable taking the next step? Are there non-monetary terms that could be part of the conversation?"',
+    'Gently explore flexibility: "I hear you on where you are. Without committing to anything, if the other side were to move significantly, is there a range you could see yourself in?"',
+    'Frame progress: "You\'ve already moved meaningfully. Is there anything about the other side\'s position that you found reasonable, even if you disagree with their number?"'
+  ],
+  late:[
+    'The gap is closing. Help the claimant see the finish line: "We\'re in a much closer space than when we started. What would it take to bring this home today?"',
+    'Reality-test gently: "I\'m not asking you to accept anything. I want to make sure you\'ve had a chance to think about the range we\'re in and what resolution would mean for you."',
+    'Explore residual issues: "Setting the number aside for a moment — are there any remaining non-monetary terms that matter most to you right now?"'
+  ],
+  close:[
+    'We may be in range. Ask: "Based on where things stand, if the other side came to {sugCP}, would that be something worth serious consideration, given everything on the table?"',
+    'Frame the moment: "This is often where cases settle. I\'d like to explore with you whether the current range — with the non-monetary terms — addresses what brought you here today."',
+    'Pre-close gently: "I\'m not asking you to commit. I want to understand: if everything came together in this range, would you be in a position to resolve this today?"'
+  ]
+};
+
+var RESP_PHRASES={
+  early:[
+    'Help the respondent clarify their interests. Ask: "Beyond the number, what does a successful resolution look like for your organization?"',
+    'Explore underlying concerns: "What is driving the position you\'ve taken today? Understanding that helps me help you."',
+    'Open a dialogue: "If the other side were willing to take a reasonable approach, what would you need to see from them to move this forward?"'
+  ],
+  mid:[
+    'Acknowledge their position. Ask: "I understand where you are. Is there room, without committing to anything, to explore what meaningful movement might look like on your end?"',
+    'Frame risk gently: "I\'m not here to pressure you. I\'d like to help you think through the full picture — both the cost of resolution and the cost of continued uncertainty."',
+    'Explore flexibility: "Are there non-monetary terms — like a neutral reference or confidentiality — that could be part of a package that works for both sides?"'
+  ],
+  late:[
+    'The gap is narrowing. Gently engage: "We\'re closer than we were this morning. What would it take on your end to get to a place where we can land this today?"',
+    'Reality-test: "I\'m not asking you to accept anything right now. I\'d like you to think about what a resolved case means for your organization versus continued proceedings."',
+    'Explore final movement: "Is there any flexibility in your current position that I could work with on the other side?"'
+  ],
+  close:[
+    'We may be within reach. Ask: "If the other side moved to {sugResp}, and the non-monetary terms are in place, is that a number your organization could accept today?"',
+    'Frame the moment: "Cases often settle in moments exactly like this one. I\'d like to explore whether we can bring this to a close."',
+    'Pre-close: "I\'m not asking for a commitment. I want to understand — if the terms came together in this range, would you have the authority to resolve this today?"'
+  ]
+};
+
+var MED_PROPOSAL_PHRASES=[
+  'Based on the movement both sides have shown today, I\'d like to explore whether a figure of <strong>{midpoint}</strong> — with the non-monetary terms already discussed — could serve as a basis for resolution. I offer this as a facilitator\'s observation, not a recommendation. The decision remains entirely with you.',
+  'We\'ve made real progress today. Given where both sides stand, a settlement in the range of <strong>{low} to {high}</strong> may be worth serious consideration. I raise this not as pressure, but as a reflection of what I\'m hearing from both rooms.',
+  'I want to offer something for your consideration. Based on the positions in this room, a number of <strong>{midpoint}</strong> — paired with the non-monetary terms — represents the zone where I believe resolution is possible. Only you can decide whether that works.'
+];
+
+function updateSuggestions(){
+  var lastDem=null,lastOff=null,firstDem=null,firstOff=null;
+  offerRounds.forEach(function(r){
+    if(r.dem){lastDem=r.dem;if(firstDem===null)firstDem=r.dem;}
+    if(r.off){lastOff=r.off;if(firstOff===null)firstOff=r.off;}
+  });
+  if(!lastDem&&!lastOff)return;
+
+  var firstGap=firstDem&&firstOff?firstDem-firstOff:null;
+  var currentGap=lastDem&&lastOff?lastDem-lastOff:null;
+  var mid=lastDem&&lastOff?Math.round((lastDem+lastOff)/2):null;
+  var phase=firstGap&&currentGap?getPhase(firstGap,currentGap):'early';
+
+  /* Update panel title */
+  document.getElementById('sugPhaseLbl').textContent=PHASE_LABELS[phase]||'Facilitator notes';
+  var bgMap={early:'var(--gray)',mid:'var(--gold-lt)',late:'var(--blue-lt)',close:'var(--green-lt)'};
+  var dots=['pd-early','pd-mid','pd-late','pd-close'];
+  var phaseOrder=['early','mid','late','close'];
+  var phaseIdx=phaseOrder.indexOf(phase);
+  dots.forEach(function(id,i){
+    var el=document.getElementById(id);
+    if(!el)return;
+    if(i<phaseIdx){el.className='phase-dot done';}
+    else if(i===phaseIdx){el.className='phase-dot active';}
+    else{el.className='phase-dot';}
+  });
+  document.getElementById('sugPanel').style.background=bgMap[phase]||'var(--gray)';
+
+  /* CP facilitator note */
+  var cpPhrases=CP_PHRASES[phase];
+  var cpIdx=offerRounds.filter(function(r){return r.dem}).length%cpPhrases.length;
+  var cpText=cpPhrases[cpIdx];
+  var sugCP=lastDem?Math.round(lastDem*0.90):null;
+  if(phase==='close'&&sugCP){
+    cpText=cpText.replace('{sugCP}',F(sugCP));
+  }
+  document.getElementById('sug-cp-body').innerHTML=cpText;
+  document.getElementById('sug-cp-card').querySelector('.sug-card-header').innerHTML=
+    '<i class="ti ti-user" aria-hidden="true"></i>Claimant caucus — '+(phase==='close'?'pre-close exploration':'facilitator note');
+
+  /* RESP facilitator note */
+  var respPhrases=RESP_PHRASES[phase];
+  var respIdx=offerRounds.filter(function(r){return r.off}).length%respPhrases.length;
+  var respText=respPhrases[respIdx];
+  var sugResp=lastOff?Math.round(lastOff*1.10):null;
+  if(phase==='close'&&sugResp){
+    respText=respText.replace('{sugResp}',F(sugResp));
+  }
+  document.getElementById('sug-resp-body').innerHTML=respText;
+  document.getElementById('sug-resp-card').querySelector('.sug-card-header').innerHTML=
+    '<i class="ti ti-building" aria-hidden="true"></i>Respondent caucus — '+(phase==='close'?'pre-close exploration':'facilitator note');
+
+  /* MEDIATOR PROPOSAL — only unlocks at close phase */
+  var medCard=document.getElementById('sug-mediator-card');
+  if(phase==='close'&&mid){
+    medCard.style.display='block';
+    var medPhrases=MED_PROPOSAL_PHRASES;
+    var medIdx=Math.floor(offerRounds.length/2)%medPhrases.length;
+    var lowRange=Math.round(mid*0.95);var highRange=Math.round(mid*1.05);
+    var medText=medPhrases[medIdx]
+      .replace('{midpoint}',F(mid))
+      .replace('{low}',F(lowRange))
+      .replace('{high}',F(highRange));
+    document.getElementById('sug-mediator-body').innerHTML=
+      '<div style="font-size:9.5px;color:var(--navy);font-weight:500;margin-bottom:5px;display:flex;align-items:center;gap:4px"><i class="ti ti-lock-open" aria-hidden="true"></i>Mediator\'s proposal unlocked — gap is within 15% of opening</div>'+
+      '<div style="margin-bottom:8px;line-height:1.6;color:var(--text2)">'+medText+'</div>'+
+      '<div style="background:var(--navy);border-radius:6px;padding:8px 10px;font-size:11px;color:#fff;display:flex;justify-content:space-between">'+
+      '<span style="color:rgba(255,255,255,.5)">Proposed figure</span><strong>'+F(mid)+'</strong>'+
+      '</div>'+
+      '<div style="font-size:9.5px;color:var(--text3);margin-top:6px;font-style:italic">This proposal is entirely voluntary. The mediator does not decide outcomes. Share only if both parties appear receptive.</div>';
+  }else{
+    medCard.style.display='none';
+  }
+
+  /* Update transcript with phase shift if needed */
+  if(phase!==updateSuggestions._lastPhase){
+    if(updateSuggestions._lastPhase!==undefined){
+      addTranscriptEntry('system','[Phase shift] '+PHASE_LABELS[phase]+'. Gap reduced to '+F(currentGap)+'.',now());
+    }
+    updateSuggestions._lastPhase=phase;
+  }
+}
+updateSuggestions._lastPhase=undefined;
+
+/* ---- WAGES ---- */
+function calcWages(){
+  var type=document.getElementById('wg-type').value;
+  var sal=+document.getElementById('wg-salary').value||0;
+  var hr=+document.getElementById('wg-hourly').value||0;
+  var hrs=+document.getElementById('wg-hours').value||40;
+  var wks=+document.getElementById('wg-weeks').value||0;
+  var benPct=(+document.getElementById('wg-benpct').value||0)/100;
+  var unemp=+document.getElementById('wg-unemp').value||0;
+  var other=+document.getElementById('wg-other').value||0;
+  var distress=+document.getElementById('dmg-distress').value||0;
+  var paydiff=+document.getElementById('dmg-paydiff').value||0;
+  var future=+document.getElementById('dmg-future').value||0;
+  var retire=+document.getElementById('dmg-retire').value||0;
+  var otherDmg=+document.getElementById('dmg-other').value||0;
+  var lowMult=+document.getElementById('dmg-low-mult').value||0.75;
+  var highMult=+document.getElementById('dmg-high-mult').value||1.25;
+  var weekly=type==='salary'?sal/52:hr*hrs;
+  var gross=weekly*wks;
+  var ben=gross*benPct;
+  var offsets=unemp+other;
+  var net=Math.max(0,gross+ben-offsets);
+  var addDmg=distress+paydiff+future+retire+otherDmg;
+  var total=net+addDmg;
+  document.getElementById('wg-weekly').textContent=F(weekly);
+  document.getElementById('wg-gross').textContent=F(gross);
+  document.getElementById('wg-ben').textContent=F(ben);
+  document.getElementById('wg-offsets').textContent=F(offsets);
+  document.getElementById('wg-net').textContent=F(net);
+  document.getElementById('dmg-add').textContent=F(addDmg);
+  document.getElementById('wg-total').textContent=F(total);
+  document.getElementById('wg-range-low').textContent=F(total*lowMult);
+  document.getElementById('wg-range-high').textContent=F(total*highMult);
+  document.getElementById('dash-lw').textContent=F(gross);
+  document.getElementById('dash-lo').textContent=F(total*lowMult);
+  document.getElementById('dash-hi').textContent=F(total*highMult);
+}
+
+/* ---- ALLOCATION ---- */
+function calcAllocation(){
+  var settle=+document.getElementById('al-settle').value||0;
+  var feePct=+document.getElementById('al-feepct').value||0.4;
+  var deduct=+document.getElementById('al-deduct').value||0;
+  var w2pct=+document.getElementById('al-w2pct').value||0.5;
+  var fee=settle*feePct;
+  var net=settle-fee-deduct;
+  document.getElementById('al-gross').textContent=F(settle);
+  document.getElementById('al-fee').textContent='-'+F(fee);
+  document.getElementById('al-ded').textContent='-'+F(deduct);
+  document.getElementById('al-net').textContent=F(net);
+  document.getElementById('al-w2').textContent=F(settle*w2pct);
+  document.getElementById('al-1099').textContent=F(settle*(1-w2pct));
+  document.getElementById('dash-fee').textContent=F(fee);
+  document.getElementById('dash-net').textContent=F(net);
+  var scens=[[.5,.5],[.6,.4],[.7,.3],[.8,.2],[.1,.9],[0,1],[1,0]];
+  var labels=['50/50','60/40','70/30','80/20','10/90','100% 1099','100% W-2'];
+  var tb=document.getElementById('alloc-tbody');tb.innerHTML='';
+  scens.forEach(function(s,i){
+    tb.innerHTML+='<tr><td>'+labels[i]+'</td><td>'+Math.round(s[0]*100)+'%</td><td>'+Math.round(s[1]*100)+'%</td><td>'+F(settle*s[0])+'</td><td>'+F(settle*s[1])+'</td><td>'+F(net)+'</td></tr>';
+  });
+}
+
+/* ---- BRACKET ---- */
+function calcBracket(){
+  var ch=+document.getElementById('br-ch').value||85000;
+  var cl=+document.getElementById('br-cl').value||60000;
+  var rl=+document.getElementById('br-rl').value||40000;
+  var rh=+document.getElementById('br-rh').value||55000;
+  var cm=(ch+cl)/2;var rm=(rl+rh)/2;
+  var split=(cm+rm)/2;
+  var gap=Math.max(0,cl-rh);
+  var zopaLow=Math.min(cl,rh);var zopaHigh=Math.max(cl,rh);
+  var overlap=rh>=cl;
+  document.getElementById('br-cm').textContent=F(cm);
+  document.getElementById('br-rm').textContent=F(rm);
+  document.getElementById('br-sm').textContent=F(split);
+  document.getElementById('br-sm2').textContent=F(split);
+  document.getElementById('br-gap').textContent=gap>0?F(gap):'Overlap — $'+Math.abs(Math.round(zopaHigh-zopaLow)).toLocaleString()+' zone';
+  document.getElementById('br-zopa').textContent=overlap?F(zopaLow)+' – '+F(zopaHigh):'No overlap — gap of '+F(gap);
+  document.getElementById('br-ov').textContent=overlap?'Yes — ZOPA exists':'No — gap exists, needs bridge';
+  document.getElementById('dash-split').textContent=F(split);
+  var sug='';
+  if(overlap){sug='Brackets overlap from <strong>'+F(zopaLow)+'</strong> to <strong>'+F(zopaHigh)+'</strong>. Present split midpoint of <strong>'+F(split)+'</strong> as zone of resolution. Each party needs to move <strong>'+F(Math.abs(zopaHigh-zopaLow)/2)+'</strong> to close.';}
+  else{sug='No bracket overlap. Gap between bracket lows is <strong>'+F(gap)+'</strong>. Request each party to narrow their range. You may explore whether both sides can narrow their brackets — the claimant floor and the respondent ceiling.';}
+  document.getElementById('br-suggest').innerHTML=sug;
+}
+
+/* ---- PROPOSAL ---- */
+function genProposal(){
+  var party=document.getElementById('prop-party').value;
+  var amt=+document.getElementById('prop-amt').value||0;
+  var w2=+document.getElementById('prop-w2').value||0;
+  var k1099=+document.getElementById('prop-1099').value||0;
+  var dl=document.getElementById('prop-deadline').value||'TBD';
+  var ref=document.getElementById('prop-ref').value;
+  var conf=document.getElementById('prop-conf').value;
+  var noadm=document.getElementById('prop-noadm').value;
+  var nrehire=document.getElementById('prop-nrehire').value;
+  var release=document.getElementById('prop-release').value;
+  var notes=document.getElementById('prop-notes').value;
+  var d=new Date();
+  var html='<div style="border-bottom:0.5px solid var(--gray3);padding-bottom:8px;margin-bottom:8px"><strong style="font-size:13px;color:var(--navy)">Settlement Proposal — For Discussion Purposes Only</strong><br><span style="font-size:10px;color:var(--text3)">Generated '+d.toLocaleDateString()+' · Presented by: '+party+'</span></div>';
+  html+='<p style="margin-bottom:6px">This proposal is made for settlement discussion purposes only. No admission of liability or merits finding is intended or implied by the making or consideration of this proposal.</p>';
+  html+='<table style="width:100%;border-collapse:collapse;font-size:11.5px;margin-top:8px">';
+  var rows=[
+    ['Total settlement amount',F(amt),'font-weight:500;color:var(--navy);font-size:13px'],
+    ['W-2 allocation (wages)',F(w2),''],
+    ['1099 allocation (non-wage)',F(k1099),''],
+    ['Payment deadline',dl,''],
+    ['Neutral reference',ref,''],
+    ['Confidentiality',conf,''],
+    ['No admission of liability',noadm,''],
+    ['No-rehire clause',nrehire,''],
+    ['Release scope',release,''],
+  ];
+  rows.forEach(function(r){
+    html+='<tr style="border-bottom:0.5px solid var(--gray3)"><td style="padding:4px 8px;color:var(--text3);width:45%">'+r[0]+'</td><td style="padding:4px 8px;'+r[2]+'">'+r[1]+'</td></tr>';
+  });
+  if(notes){html+='<tr><td style="padding:4px 8px;color:var(--text3)">Additional terms</td><td style="padding:4px 8px">'+notes+'</td></tr>';}
+  html+='</table>';
+  html+='<p style="font-size:10px;color:var(--text3);margin-top:10px;padding-top:8px;border-top:0.5px solid var(--gray3)">This proposal remains open for acceptance or rejection solely by the parties. Settlement decisions rest with the parties, not the mediator. This proposal does not constitute legal or tax advice.</p>';
+  document.getElementById('proposal-output').innerHTML=html;
+}
+
+/* ---- AI SUMMARY ---- */
+function generateAISummary(){
+  var lastDem=null,lastOff=null;
+  offerRounds.forEach(function(r){if(r.dem)lastDem=r.dem;if(r.off)lastOff=r.off;});
+  var cpNotes=transcriptEntries.filter(function(e){return e.room==='cp'}).map(function(e){return e.text}).join(' ');
+  var respNotes=transcriptEntries.filter(function(e){return e.room==='resp'}).map(function(e){return e.text}).join(' ');
+  var jointNotes=transcriptEntries.filter(function(e){return e.room==='joint'}).map(function(e){return e.text}).join(' ');
+  var gap=lastDem&&lastOff?lastDem-lastOff:null;
+  var mid=lastDem&&lastOff?Math.round((lastDem+lastOff)/2):null;
+  var html='<div class="ai-summary-box"><div class="ai-sum-header"><i class="ti ti-sparkles" aria-hidden="true"></i>Full session summary — '+offerRounds.length+' rounds · '+transcriptEntries.length+' transcript entries</div>';
+  html+='<div class="ai-sum-section"><strong>Current positions:</strong> CP demand '+F(lastDem)+' · Respondent offer '+F(lastOff)+(gap?' · Gap: '+F(gap)+' · Midpoint: '+F(mid):'')+'</div>';
+  if(jointNotes)html+='<div class="ai-sum-section"><strong>Joint session:</strong> '+jointNotes.substring(0,300)+(jointNotes.length>300?'…':'')+'</div>';
+  if(cpNotes)html+='<div class="ai-sum-section"><strong>Claimant caucus notes:</strong> '+cpNotes.substring(0,300)+(cpNotes.length>300?'…':'')+'</div>';
+  if(respNotes)html+='<div class="ai-sum-section"><strong>Respondent caucus notes:</strong> '+respNotes.substring(0,300)+(respNotes.length>300?'…':'')+'</div>';
+  if(!cpNotes&&!respNotes&&!jointNotes)html+='<div class="ai-sum-section" style="color:var(--text3)">No transcript entries yet. Use the recorder on the left to log notes in each room.</div>';
+  html+='<div class="ai-sum-section"><strong>Offer history:</strong> '+offerRounds.length+' rounds logged.</div>';
+  if(gap&&mid)html+='<div class="ai-sum-section"><strong>Mediator analysis:</strong> Current gap is '+F(gap)+'. Midpoint is '+F(mid)+'. '+(gap<30000?'Gap is narrowing — within bracketing range.':'Gap remains significant — bracketing approach recommended.')+'</div>';
+  html+='</div>';
+  document.getElementById('aiSummaryOutput').innerHTML=html;
+  showTab('summary-tab',null);
+}
+
+function generateRoomSummary(room){
+  var entries=transcriptEntries.filter(function(e){return e.room===room});
+  var roomLabel=roomLabels[room]||room;
+  var html='<div class="ai-summary-box"><div class="ai-sum-header"><i class="ti ti-notes" aria-hidden="true"></i>'+roomLabel+' summary — '+entries.length+' entries</div>';
+  if(!entries.length){html+='<div style="color:var(--text3)">No entries logged for '+roomLabel+' yet.</div>';}
+  else{entries.forEach(function(e){html+='<div class="ai-sum-section"><span style="font-size:9px;color:var(--text3)">'+e.time+'</span><br>'+e.text+'</div>';});}
+  html+='</div>';
+  document.getElementById('aiSummaryOutput').innerHTML=html;
+}
+
+/* ---- EXPORT ---- */
+function exportTranscript(){
+  var lines=['SETTLEMENT SUITE™ — SESSION TRANSCRIPT','Generated: '+new Date().toLocaleString(),'---'];
+  transcriptEntries.forEach(function(e){lines.push('['+e.time+'] ['+roomLabels[e.room]+'] '+e.text);});
+  var blob=new Blob([lines.join('\n')],{type:'text/plain'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mediation_transcript_'+Date.now()+'.txt';a.click();
+}
+
+function copyProposal(){
+  var txt=document.getElementById('proposal-output').innerText;
+  navigator.clipboard.writeText(txt).then(function(){alert('Proposal copied to clipboard.');});
+}
+
+/* ---- TABS ---- */
+function showTab(id,el){
+  document.querySelectorAll('.tabcontent').forEach(function(t){t.classList.remove('active')});
+  document.getElementById('tab-'+id).classList.add('active');
+  if(el){document.querySelectorAll('.stab').forEach(function(s){s.classList.remove('active')});el.classList.add('active');}
+}
+
+/* ---- INIT ---- */
+(function init(){
+  renderOffers();
+  calcBracket();
+  calcAllocation();
+  calcWages();
+  genProposal();
+  try{updateSuggestions();}catch(e){console.warn('Suggestion engine:',e.message);}
+
+
+/* ================================================================
+   SPEECH RECOGNITION & TRANSCRIPTION ENGINE
+   Uses Web Speech API (Chrome / Edge built-in, no API key needed)
+   Falls back to manual entry on unsupported browsers.
+================================================================ */
+
+var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition || null;
+var recognizer = null;
+var isRecording = false;
+var isPaused = false;
+var silenceTimer = null;
+var lastFinalText = '';
+var sessionSegments = []; // {room, time, text, auto:true/false}
+
+/* ── INIT RECOGNIZER ── */
+function initRecognizer() {
+  if (!SpeechRecognition) {
+    document.getElementById('permWarn').style.display = 'block';
+    document.getElementById('recStatus').textContent = 'Live transcription not supported — use Chrome or Edge';
+    return false;
+  }
+  recognizer = new SpeechRecognition();
+  recognizer.continuous = true;
+  recognizer.interimResults = true;
+  recognizer.maxAlternatives = 1;
+  recognizer.lang = 'en-US';
+
+  /* Interim results — show in the bar while speaking */
+  recognizer.onresult = function(event) {
+    var interimText = '';
+    var finalText = '';
+    for (var i = event.resultIndex; i < event.results.length; i++) {
+      var transcript = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalText += transcript;
+      } else {
+        interimText += transcript;
+      }
+    }
+    /* Show interim in the live bar */
+    var interimBar = document.getElementById('interimBar');
+    if (interimText) {
+      interimBar.textContent = '🎤 ' + interimText;
+      interimBar.classList.add('show');
+    } else {
+      interimBar.textContent = '';
+      interimBar.classList.remove('show');
+    }
+    /* Auto-log finalized speech */
+    if (finalText.trim()) {
+      var autoLog = document.getElementById('autoLogChk') && document.getElementById('autoLogChk').checked;
+      if (autoLog) {
+        autoLogSpeech(finalText.trim());
+      } else {
+        /* Append to the manual textarea for the mediator to review before logging */
+        var ta = document.getElementById('noteInput');
+        ta.value = (ta.value ? ta.value + ' ' : '') + finalText.trim();
+      }
+      /* Reset silence detection */
+      clearTimeout(silenceTimer);
+      silenceTimer = setTimeout(function() {
+        if (isRecording && !isPaused) {
+          addTranscriptEntry('system', '[Silence detected — still recording. Speak to continue.]', now());
+        }
+      }, 30000); // 30s silence warning
+    }
+  };
+
+  recognizer.onerror = function(event) {
+    if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+      document.getElementById('permWarn').style.display = 'block';
+      stopRecording();
+    } else if (event.error === 'no-speech') {
+      /* Ignore — happens frequently, not an error */
+    } else if (event.error === 'network') {
+      document.getElementById('recStatus').textContent = 'Network error — check connection. Still logging manually.';
+    } else {
+      console.warn('Speech recognition error:', event.error);
+    }
+  };
+
+  recognizer.onend = function() {
+    /* Auto-restart if we're still supposed to be recording (browser stops after ~60s) */
+    if (isRecording && !isPaused) {
+      try { recognizer.start(); } catch(e) { /* already started */ }
+    } else {
+      document.getElementById('interimBar').classList.remove('show');
+    }
+  };
+
+  return true;
+}
+
+/* ── START RECORDING ── */
+function toggleRecording() {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+}
+
+function startRecording() {
+  if (!recognizer) {
+    var ok = initRecognizer();
+    if (!ok) return;
+  }
+  try {
+    recognizer.start();
+    isRecording = true;
+    isPaused = false;
+    updateRecUI();
+    addTranscriptEntry('system', '[Recording started — live transcription active for ' + roomLabels[currentRoom] + ']', now());
+    document.getElementById('permWarn').style.display = 'none';
+  } catch(e) {
+    document.getElementById('recStatus').textContent = 'Could not start — try refreshing and allowing microphone access.';
+    document.getElementById('permWarn').style.display = 'block';
+  }
+}
+
+function stopRecording() {
+  if (recognizer) {
+    try { recognizer.stop(); } catch(e) {}
+  }
+  isRecording = false;
+  isPaused = false;
+  clearTimeout(silenceTimer);
+  document.getElementById('interimBar').classList.remove('show');
+  updateRecUI();
+  addTranscriptEntry('system', '[Recording stopped]', now());
+}
+
+function pauseRecording() {
+  if (!isRecording) return;
+  isPaused = true;
+  try { recognizer.stop(); } catch(e) {}
+  document.getElementById('interimBar').classList.remove('show');
+  updateRecUI();
+  addTranscriptEntry('system', '[Recording paused — room: ' + roomLabels[currentRoom] + ']', now());
+}
+
+function resumeRecording() {
+  if (!isRecording || !isPaused) return;
+  isPaused = false;
+  try { recognizer.start(); } catch(e) {}
+  updateRecUI();
+  addTranscriptEntry('system', '[Recording resumed — room: ' + roomLabels[currentRoom] + ']', now());
+}
+
+/* ── AUTO-LOG FINALIZED SPEECH ── */
+function autoLogSpeech(text) {
+  /* Segment detection: if text is very short (<3 words) and we have a recent entry,
+     append to it instead of creating a new entry to avoid fragmentation */
+  var words = text.split(/\s+/).length;
+  var wrap = document.getElementById('transcriptWrap');
+  var lastEntry = wrap.querySelector('.t-entry:last-child');
+
+  if (words < 4 && lastEntry) {
+    var lastBubble = lastEntry.querySelector('.t-bubble');
+    var lastMeta = lastEntry.querySelector('.t-meta');
+    var lastRoomBadge = lastMeta ? lastMeta.querySelector('.t-room-badge') : null;
+    var lastRoomClass = lastRoomBadge ? lastRoomBadge.className : '';
+    /* Only append if same room */
+    if (lastRoomClass.indexOf(roomBadgeClass[currentRoom]) >= 0) {
+      if (lastBubble) {
+        var safeAppend=typeof escapeHtml==='function'?escapeHtml(text):text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        lastBubble.innerHTML = lastBubble.innerHTML + ' ' + safeAppend;
+        return;
+      }
+    }
+  }
+
+  /* New entry */
+  transcriptEntries.push({room: currentRoom, text: text, time: now(), auto: true});
+  var badgeClass = roomBadgeClass[currentRoom] || 'trb-system';
+  var bubbleClass = currentRoom === 'joint' ? 'joint' :
+                    currentRoom === 'cp' ? 'cp' :
+                    currentRoom === 'resp' ? 'resp' : 'system';
+
+  var html = '<div class="t-entry">' +
+    '<div class="t-meta">' +
+    '<span class="t-room-badge ' + badgeClass + '">' + roomLabels[currentRoom] + '</span>' +
+    '<span>' + now() + '</span>' +
+    '<span class="auto-badge">Auto</span>' +
+    '</div>' +
+    '<div class="t-bubble ' + bubbleClass + '">' + escapeHtml(text) + '</div>' +
+    '</div>';
+  wrap.insertAdjacentHTML('beforeend', html);
+  wrap.scrollTop = wrap.scrollHeight;
+  document.getElementById('entryCount').textContent = transcriptEntries.length + ' entries';
+}
+
+function escapeHtml(t) {
+  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── UPDATE RECORDING UI ── */
+function updateRecUI() {
+  var recBtn = document.getElementById('recBtn');
+  var pauseBtn = document.getElementById('pauseBtn');
+  var resumeBtn = document.getElementById('resumeBtn');
+  var recStatus = document.getElementById('recStatus');
+
+  if (!isRecording) {
+    recBtn.className = 'rec-btn';
+    recBtn.innerHTML = '<span class="rec-dot"></span>Record';
+    pauseBtn.style.display = 'none';
+    resumeBtn.style.display = 'none';
+    recStatus.className = 'rec-status';
+    recStatus.textContent = 'Ready — click Record to start live transcription';
+  } else if (isPaused) {
+    recBtn.className = 'rec-btn';
+    recBtn.innerHTML = '<span class="rec-dot"></span>Stop';
+    pauseBtn.style.display = 'none';
+    resumeBtn.style.display = 'inline-flex';
+    recStatus.className = 'rec-status paused';
+    recStatus.textContent = 'Paused — click Resume to continue';
+  } else {
+    recBtn.className = 'rec-btn recording';
+    recBtn.innerHTML = '<span class="rec-dot"></span>Stop';
+    pauseBtn.style.display = 'inline-flex';
+    resumeBtn.style.display = 'none';
+    recStatus.className = 'rec-status live';
+    recStatus.textContent = 'Recording live — ' + roomLabels[currentRoom];
+  }
+}
+
+/* Auto-update status bar room label while recording */
+var _origSetRoom = setRoom;
+setRoom = function(r) {
+  _origSetRoom(r);
+  if (isRecording && !isPaused) {
+    document.getElementById('recStatus').textContent = 'Recording live — ' + roomLabels[r];
+    /* Log room switch in transcript automatically when recording */
+    addTranscriptEntry('system', '[Room switch while recording: now in ' + roomLabels[r] + ']', now());
+  }
+};
+
+/* ── CLEAR TRANSCRIPT ── */
+function clearTranscript() {
+  if (!confirm('Clear all transcript entries? This cannot be undone.')) return;
+  transcriptEntries = [];
+  document.getElementById('transcriptWrap').innerHTML = '';
+  document.getElementById('entryCount').textContent = '0 entries';
+}
+
+/* ── SEARCH TRANSCRIPT ── */
+function searchTranscript(query) {
+  var entries = document.querySelectorAll('.t-bubble');
+  entries.forEach(function(el) {
+    /* Remove previous highlights */
+    el.innerHTML = el.innerHTML.replace(/<mark class="highlight">([^<]*)<\/mark>/g, '$1');
+    if (!query) return;
+    var re = new RegExp('(' + query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + ')', 'gi');
+    el.innerHTML = el.innerHTML.replace(re, '<mark class="highlight">$1</mark>');
+  });
+}
+
+/* ── EXPORT — enhanced with auto/manual labels ── */
+function exportTranscriptDoc() {
+  var lines = [
+    'SETTLEMENT SUITE MEDIATION TRANSCRIPT',
+    'Generated: ' + new Date().toLocaleString(),
+    'Case: ' + document.getElementById('topCaseLabel').textContent,
+    '========================================',
+    ''
+  ];
+  transcriptEntries.forEach(function(e) {
+    var label = e.auto ? '[AUTO-TRANSCRIBED]' : '[MANUAL NOTE]';
+    lines.push('[' + e.time + '] [' + (roomLabels[e.room] || e.room) + '] ' + label);
+    lines.push(e.text);
+    lines.push('');
+  });
+  var blob = new Blob([lines.join('\n')], {type: 'text/plain'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mediation_transcript_' + Date.now() + '.txt';
+  a.click();
+}
+
+
+})();
+</script>
+
+<!-- ── POSTHOG ANALYTICS ──────────────────────────────────────────── -->
+<script>
+/* PostHog CDN Loader */
+!function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+" (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset isIdentified opt_out_capturing has_opted_out_capturing opt_in_capturing opt_out_capturing_and_start_session_recording opt_in_capturing_and_start_session_recording alias createPersonProfile debug".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+
+/* ── SSP ANALYTICS WRAPPER ────────────────────────────────────────── */
+var SSP = {
+  phReady: false,
+  queue: [],
+  _debounce: {},
+  _proposalFired: false,
+
+  phFlush: function() {
+    SSP.queue.forEach(function(fn){ fn(); });
+    SSP.queue = [];
+  },
+
+  capture: function(event, props) {
+    var fn = function(){ posthog.capture(event, props || {}); };
+    SSP.phReady ? fn() : SSP.queue.push(fn);
+  },
+
+  identify: function(licenseKey, unlockSource) {
+    var prefix = licenseKey.substring(0, 8);
+    var distinctId = 'ssp-' + prefix + '-' + licenseKey.slice(-4);
+    var fn = function() {
+      posthog.identify(distinctId, {
+        license_key_prefix: prefix,
+        unlock_source: unlockSource || 'unknown',
+        device_type: SSP.deviceType(),
+        $set_once: { first_unlocked_at: new Date().toISOString() }
+      });
+    };
+    SSP.phReady ? fn() : SSP.queue.push(fn);
+  },
+
+  debounce: function(key, fn, ms) {
+    clearTimeout(SSP._debounce[key]);
+    SSP._debounce[key] = setTimeout(fn, ms || 1000);
+  },
+
+  deviceType: function() {
+    return window.innerWidth < 768 ? 'mobile'
+         : window.innerWidth < 1100 ? 'tablet' : 'desktop';
+  }
+};
+
+/* ── INIT ─────────────────────────────────────────────────────────── */
+posthog.init('phc_p2gZjxaoaeVJYh445AxyZuKdzhgFQQ2thxdTVzczaDCP', {
+  api_host: 'https://us.i.posthog.com',
+  defaults: '2026-01-30',
+  autocapture: false,
+  capture_pageview: false,
+  disable_session_recording: false,
+  session_recording: {
+    maskAllInputs: true,
+    maskTextSelector: '#licenseInput'
+  },
+  loaded: function(ph) {
+    /* Skip tracking when opened from local filesystem (dev/preview) */
+    if (window.location.protocol === 'file:') {
+      ph.opt_out_capturing();
+      return;
+    }
+    SSP.phReady = true;
+    SSP.phFlush();
+    SSP.capture('paywall_viewed', {
+      referrer: document.referrer || 'direct',
+      device_type: SSP.deviceType()
+    });
+  }
+});
+
+/* ── HOOK UNLOCKING ───────────────────────────────────────────────── */
+/* Wrap unlockApp to fire analytics */
+var _sspOrigUnlock = window.unlockApp;
+window.unlockApp = function() {
+  var key = document.getElementById('licenseInput').value.trim().toUpperCase();
+  var validPattern = /^SSP-[A-Z0-9]{4}-[A-Z0-9]{4}-[A-Z0-9]{4}$/;
+  var isValid = validPattern.test(key);
+  SSP.capture('license_key_attempted', {
+    success: isValid,
+    error_reason: isValid ? null : 'invalid_format'
+  });
+  _sspOrigUnlock();
+  if (isValid) {
+    SSP.identify(key, 'key_entry');
+    SSP.capture('app_unlocked', {
+      license_key_prefix: key.substring(0, 8),
+      unlock_method: 'key_entry',
+      $set_once: { first_unlocked_at: new Date().toISOString() }
+    });
+  }
+};
+
+/* Auto-unlock from localStorage also fires analytics */
+(function() {
+  var stored = localStorage.getItem('ssp_licensed');
+  if (stored) {
+    SSP.identify(stored, 'remembered');
+    SSP.capture('app_unlocked', {
+      license_key_prefix: stored.substring(0, 8),
+      unlock_method: 'remembered'
+    });
+  }
+})();
+
+/* ── HOOK TABS ────────────────────────────────────────────────────── */
+var _sspOrigShowTab = window.showTab;
+window.showTab = function(id, el) {
+  _sspOrigShowTab(id, el);
+  SSP.capture('tab_viewed', {
+    tab_name: id,
+    session_duration_secs: (typeof timerSecs !== 'undefined') ? timerSecs : 0
+  });
+};
+
+/* ── HOOK OFFER TRACKER ───────────────────────────────────────────── */
+var _sspOrigAddOffer = window.addOfferRound;
+window.addOfferRound = function() {
+  var dem = +document.getElementById('new-dem').value || 0;
+  var off = +document.getElementById('new-off').value || 0;
+  _sspOrigAddOffer();
+  SSP.capture('offer_round_added', {
+    round_number: offerRounds.length,
+    has_demand: dem > 0,
+    has_offer: off > 0,
+    gap_amount: (dem && off) ? Math.abs(dem - off) : null,
+    midpoint: (dem && off) ? (dem + off) / 2 : null
+  });
+};
+
+/* ── HOOK RECORDING ───────────────────────────────────────────────── */
+var _sspOrigToggleRec = window.toggleRecording;
+window.toggleRecording = function() {
+  var wasRecording = (typeof isRecording !== 'undefined') ? isRecording : false;
+  _sspOrigToggleRec();
+  if (!wasRecording) {
+    SSP.capture('recording_started', {
+      room: (typeof currentRoom !== 'undefined') ? currentRoom : 'unknown'
+    });
+  }
+};
+
+/* ── HOOK TRANSCRIPT EXPORT ───────────────────────────────────────── */
+var _sspOrigExport = window.exportTranscriptDoc;
+window.exportTranscriptDoc = function() {
+  SSP.capture('transcript_exported', {
+    entry_count: (typeof transcriptEntries !== 'undefined') ? transcriptEntries.length : 0
+  });
+  _sspOrigExport();
+};
+
+/* ── HOOK AI SUMMARY ──────────────────────────────────────────────── */
+var _sspOrigAISummary = window.generateAISummary;
+window.generateAISummary = function() {
+  SSP.capture('ai_summary_generated', {
+    summary_type: 'full',
+    transcript_entry_count: (typeof transcriptEntries !== 'undefined') ? transcriptEntries.length : 0
+  });
+  _sspOrigAISummary();
+};
+
+/* ── HOOK TIMER ───────────────────────────────────────────────────── */
+var _sspOrigTimer = window.toggleTimer;
+window.toggleTimer = function() {
+  var wasRunning = (typeof timerRunning !== 'undefined') ? timerRunning : false;
+  _sspOrigTimer();
+  if (!wasRunning) {
+    SSP.capture('session_timer_started', {});
+  }
+};
+
+/* ── HOOK MOBILE PANEL SWITCH ─────────────────────────────────────── */
+var _sspOrigMobPanel = window.mobShowPanel;
+window.mobShowPanel = function(panel) {
+  _sspOrigMobPanel(panel);
+  SSP.capture('mobile_panel_switched', { panel: panel });
+};
+
+/* ── BUY BUTTON CLICKS ────────────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', function() {
+  var gumroadBtn = document.querySelector('.pw-btn-primary');
+  var etsyBtn    = document.querySelector('.pw-btn-secondary');
+  if (gumroadBtn) {
+    gumroadBtn.addEventListener('click', function() {
+      SSP.capture('paywall_buy_clicked', { platform: 'gumroad' });
+    });
+  }
+  if (etsyBtn) {
+    etsyBtn.addEventListener('click', function() {
+      SSP.capture('paywall_etsy_clicked', { platform: 'etsy' });
+    });
+  }
+});
+
+/* ── DEBOUNCED USAGE EVENTS ───────────────────────────────────────── */
+/* Bracket calculator — fires 1s after last input */
+document.addEventListener('input', function(e) {
+  var id = e.target && e.target.id;
+  if (id && id.startsWith('br-')) {
+    SSP.debounce('bracket', function() {
+      var lo1 = +document.getElementById('br-cl').value || 0;
+      var lo2 = +document.getElementById('br-rl').value || 0;
+      SSP.capture('bracket_calculated', {
+        has_overlap: lo1 > 0 && lo2 > 0 && lo2 <= lo1
+      });
+    });
+  }
+  if (id && (id.startsWith('wg-') || id.startsWith('dmg-'))) {
+    SSP.debounce('damages', function() {
+      var payType = document.getElementById('wg-type');
+      SSP.capture('damages_calculated', {
+        pay_type: payType ? payType.value : 'salary',
+        has_additional_damages: (+document.getElementById('dmg-distress').value || 0) > 0
+      });
+    });
+  }
+  if (id && id.startsWith('prop-') && !SSP._proposalFired) {
+    SSP._proposalFired = true;
+    SSP.debounce('proposal', function() {
+      var partyEl = document.getElementById('prop-party');
+      var refEl   = document.getElementById('prop-ref');
+      var confEl  = document.getElementById('prop-conf');
+      SSP.capture('proposal_generated', {
+        party: partyEl ? partyEl.value : '',
+        has_neutral_reference: refEl ? refEl.value.indexOf('Yes') === 0 : false,
+        confidentiality: confEl ? confEl.value : ''
+      });
+    });
+  }
+});
+</script>
+<!-- ── END POSTHOG ───────────────────────────────────────────────── -->
+</body>
+</html>
+
