@@ -1,0 +1,36 @@
+LICENSE.txt
+Settlement Suite™ Pro
+Copyright © 2026 Mathelier Marketing Group. All rights reserved.
+
+PROPRIETARY SOFTWARE — ALL RIGHTS RESERVED
+
+This software and all associated files are the exclusive intellectual
+property of Mathelier Marketing Group. Unauthorized copying,
+distribution, modification, sublicensing, or resale of this software,
+in whole or in part, is strictly prohibited without express written
+permission from Mathelier Marketing Group.
+
+PERMITTED USE:
+- Purchase grants a single-user, non-transferable license
+- May be used for unlimited cases by the licensed individual
+- May not be shared, resold, or redistributed
+- Lite tier: personal use only
+- Professional tier: professional/commercial use, single user
+- Commercial tier: commercial use, teams, organizations
+
+TRADEMARK NOTICE:
+Settlement Suite™ is a trademark of Mathelier Marketing Group.
+Unauthorized use of this trademark is prohibited.
+
+DISCLAIMER:
+This tool is for settlement planning and negotiation organization
+purposes only. It does not constitute legal, tax, or financial advice.
+Always consult a licensed attorney for legal decisions and a qualified
+tax professional for tax matters.
+
+SUPPORT:
+Purchase receipts include technical support contact information.
+Follow @MathelierMMG on X (Twitter) for updates.
+
+Contact: @MathelierMMG
+Website: https://mathelier1.gumroad.com/l/acxajj
